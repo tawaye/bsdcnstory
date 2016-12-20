@@ -1,0 +1,19 @@
+<html>
+<head>
+	{% load static %}
+	<link rel="stylesheet" type="text/css" href="{% static 'uikit.css' %}"/>
+	<link rel="stylesheet" type="text/css" href="{% static 'datepicker.css' %}"/>
+	<script src="{% static 'jquery-3.1.1.js' %}"></script>
+	<script src="{% static 'uikit.js' %}"></script>
+	<script src="{% static 'datepicker.js' %}"></script>
+</head>
+<body>
+	<div class="uk-container uk-container-center uk-text-center uk-margin-top">
+		<div class="uk-block uk-box-large" style="background: url({% static 'xxx.jpg' %})">
+			<h1>Brossard中文故事会</h1>
+		</div>
+	{% block content %}	
+	{% endblock %}
+	</div>
+</body>
+</html>

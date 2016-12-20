@@ -1,0 +1,22 @@
+{% extends "./base.html" %}
+{% block content %}
+	
+	<div class="uk-panel uk-container-center uk-text-left" style="width:480px">
+	{% if isactive %}
+		<h3>Notice of Next Story Gathering</h3>
+		<hr>
+		<p>Next story gathering will be held on {{ gathering_date }}, at {{ gathering_place }}</p>
+		</div>
+	{% else %}
+		<p> {{ errmsg }}</p>
+	{% endif %}
+	{% if isadmin %}
+	<div class="uk-panel uk-container-center uk-text-center" style="width:480px">
+		<form class="uk-form" method="post">
+		{% csrf_token %}
+		<button name="publishnotice" class="uk-button uk-button-primary">Publish</button>
+		<button name="modifynotice" class="uk-button uk-button-primary">Modify</button>
+		</form>
+	</div>
+	{% endif %}
+{% endblock %}
