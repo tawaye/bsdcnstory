@@ -3,12 +3,49 @@
 
 	<div class="uk-panel uk-container-center uk-text-left" style="width: 480px">
 
-	<h3>Create a new story gathering notice</h3>
+	<h2>Create a new story gathering notice</h2>
 	<hr>
-	<form class="uk-form" method="post" action="">
+	<form class="uk-form uk-form-stacked" method="post" action="">
 		{% csrf_token %}
-		<input name="gathering_date" type="text" value="{{ gathering_date }}" data-uk-datepicker="{format:'YYYY-MM-DD'}">
-		<button name="previewnotice" class="uk-button uk-button-primary">Preview Notice</button>
+		<div class="uk-form-row">
+			<label class="uk-form-label">Date:</label>
+			<input name="gathering_date" type="text" value="{{ gathering_date }}" data-uk-datepicker="{format:'YYYY-MM-DD'}">
+		</div>
+		<div class="uk-form-row">
+			<label class="uk-form-label">Start Time</label>
+			<input name="gathering_starttime" type="text" value="{{ gathering_starttime }}" data-uk-timepicker="{format:'12h'}">
+		</div>
+		<div class="uk-form-row">
+			<label class="uk-form-label">End Time</label>
+			<input name="gathering_endtime" type="text" value="{{ gathering_endtime }}" data-uk-timepicker="{format:'12h'}">
+		</div>
+		<div class="uk-form-row">
+			<label class="uk-form-label">Place:</label>
+			<input name="gathering_place" type="text" size="49" maxlength="45" value="{{ gathering_place }}" >
+		</div>
+		<div class="uk-form-row">
+			<label class="uk-form-label">Maximum group size:</label>
+			<input name="max_groupsize" type="text" size="49" maxlength="45" value="{{ max_groupsize }}" >
+		</div>
+
+		<div class="uk-form-row">
+			<label class="uk-form-label">Moderator:</label>
+			<input name="gathering_moderator" type="text" value="{{ gathering_moderator }}">
+		</div>
+		<div class="uk-form-row">
+			<label class="uk-form-label">Topic:</label>
+			<input name="gathering_topic" type="text" size="49" maxlength="45" value="{{ gathering_topic }}">
+		</div>
+		<div class="uk-form-row">
+			<label class="uk-form-label">Registration Time:</label>
+			<input name="registration_date" type="text" value="{{ registration_date }}" data-uk-datepicker="{format:'YYYY-MM-DD'}">
+			<input name="registration_time" type="text" value="{{ registration_time }}" data-uk-timepicker="{format:'12h'}">
+		</div>
+		<div class="uk-form-row uk-text-center">
+			<button name="previewnotice" class="uk-button uk-button-primary">Preview Notice</button>
+		</div>
+
+
 	</form>		
 	
 	</div>
