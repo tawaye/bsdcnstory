@@ -1,5 +1,6 @@
 <html>
 <head>
+	<title>{{ title }}</title>
 	{% load static %}
 	<link rel="stylesheet" type="text/css" href="{% static 'uikit.css' %}"/>
 	<link rel="stylesheet" type="text/css" href="{% static 'datepicker.css' %}"/>
@@ -12,7 +13,8 @@
 <body class="">
 	<div class="uk-container uk-container-center uk-text-center uk-margin-top">
 		<div class="uk-block uk-box-large" style="background: url({% static 'xxx.jpg' %})">
-			<h1>Brossard中文故事会</h1>
+			<p style="font-size: 42px">{{ heading }}</p>
+			<hr>
 		</div>
 	{% block content %}	
 	{% endblock %}

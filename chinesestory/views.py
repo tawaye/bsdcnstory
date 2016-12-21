@@ -15,6 +15,19 @@ from chinesestory.models import *
 
 notice_file_path = '/home/tawayee/6677ba-env/sixsevenba/chinesestory/noticefiles/' 
 
+errmsg = [
+	'Success', # errcode = 0
+	'The gathering date is not valid', # errcode = 1
+	'The start_time is not valid', # errcode = 2
+	'The end_time is not valid', # errcode = 3
+	'The end_time cannot be earlier than start_time', # errcode = 4
+	'The max group size is not valid', # errcode = 5
+	'', # errcode = 6
+	'', # errcode = 7
+	'', # errcode = 8
+	'Unspecified error', # errcode = 9
+]
+
 def adminlogin(request):
 	context = {}
 	if request.user.is_authenticated:
@@ -56,24 +69,25 @@ def createnotice(request):
 		if 'previewnotice' in request.POST:
 			context['isadmin'] = True
 			context['isactive'] = True	
-			gathering_date = request.POST['gathering_date']
-			if checkdate(gathering_date):
+			current_notice['gathering_date'] = request.POST['gathering_date']
+			current_notice['gathering_starttime'] = request.POST['gathering_starttime']
+			current_notice['gathering_endtime'] = request.POST['gathering_endtime']
+			current_notice['gathering_place'] = request.POST['gathering_place']
+			current_notice['gathering_address'] = request.POST['gathering_address']
+			current_notice['gathering_moderator'] = request.POST['gathering_moderator']
+			current_notice['gathering_topic'] = request.POST['gathering_topic']
+			current_notice['max_groupsize'] = request.POST['max_groupsize']
+			current_notice['registration_date'] = request.POST['registration_date']
+			current_notice['registration_time'] = request.POST['registration_time']
+			errmsgs = checknotice(current_notice)
+			if len(errmsgs) == 0: 
 				context['isadmin'] = True
 				context['isactive'] = True
-				current_notice['gathering_date'] = gathering_date
-				current_notice['gathering_starttime'] = request.POST['gathering_starttime']
-				current_notice['gathering_endtime'] = request.POST['gathering_endtime']
-				current_notice['gathering_place'] = request.POST['gathering_place']
-				current_notice['gathering_moderator'] = request.POST['gathering_moderator']
-				current_notice['gathering_topic'] = request.POST['gathering_topic']
-				current_notice['max_groupsize'] = request.POST['max_groupsize']
-				current_notice['registration_date'] = request.POST['registration_date']
-				current_notice['registration_time'] = request.POST['registration_time']
-				record_current_notice(current_notice)
 				context.update(current_notice)
+				record_current_notice(current_notice)
 				return render(request, 'notice.html', context)
 			else:
-				context['errmsg'] = 'Invalid date.'
+				context['errmsg'] = errmsgs
 				return render(request, 'error.html', context)
 		elif 'publishnotice' in request.POST:
 			current_notice = read_current_notice()
@@ -89,7 +103,8 @@ def createnotice(request):
 		else:
 			return render(request, 'error.html', {})
 	else:
-		return render(request, 'createnotice.html', {})
+		default_notice = setdefaultnotice()
+		return render(request, 'createnotice.html', default_notice)
 
 def shownotice(request):
 	context = {}
@@ -98,6 +113,8 @@ def shownotice(request):
 	gathering_date = current_notice['gathering_date']
 	if gathering_date != '' and datetime.strptime(gathering_date, '%Y-%m-%d').date() >= datetime.today().date():
 		context['isactive'] = True
+		context['title'] = 'Brossard Chinese Story Time ' + gathering_date	
+		context['heading'] = 'Brossard Chinese Story Time ' + gathering_date	
 		context.update(current_notice)
 		return render(request, 'notice.html', context)
 	else:
@@ -105,15 +122,37 @@ def shownotice(request):
 		return render(request, 'notice.html', context)
 
 
-def checkdate(date):
+def checknotice(notice):
+	errmsgs = []
 	try:
-		pDate = datetime.strptime(date, "%Y-%m-%d")
-		if pDate.date() >= datetime.today().date():
-			return True
-		else:
-			return False
+		pDate = datetime.strptime(notice['gathering_date'], "%Y-%m-%d")
+		if pDate.date() < datetime.today().date():
+			errcode = 1
+			errmsgs.append(errmsg[errcode])
 	except ValueError:
-		return False
+		errcode = 1
+		errmsgs.append(errmsg[errcode])
+	try:
+		pStartTime = datetime.strptime(notice['gathering_starttime'], "%I:%M %p")
+	except ValueError:
+		errcode = 2
+		errmsgs.append(errmsg[errcode])
+	try:
+		pEndTime = datetime.strptime(notice['gathering_endtime'], "%I:%M %p")
+	except ValueError:
+		errcode = 3
+		errmsgs.append(errmsg[errcode])
+
+	try:
+		pSize = int(notice['max_groupsize'])
+		if pSize <= 0:
+			errcode = 5
+			errmsgs.append(errmsg[errcode])
+	except ValueError:
+		errcode = 5
+		errmsgs.append(errmsg[errcode])
+
+	return errmsgs
 	
 
 def record_current_notice(notice):
@@ -123,7 +162,8 @@ def record_current_notice(notice):
 		gathering_starttime = notice['gathering_starttime'],
 		gathering_endtime = notice['gathering_endtime'],
 		gathering_place = notice['gathering_place'],
-		max_groupsize = notice['max_groupsize'],
+		gathering_address = notice['gathering_address'],
+		max_groupsize = int(notice['max_groupsize']),
 		gathering_moderator = notice['gathering_moderator'],
 		gathering_topic = notice['gathering_topic'],
 		registration_date = notice['registration_date'],
@@ -143,6 +183,7 @@ def read_current_notice():
 		current_notice['gathering_starttime'] = noticeDB.gathering_starttime
 		current_notice['gathering_endtime'] = noticeDB.gathering_endtime
 		current_notice['gathering_place'] = noticeDB.gathering_place
+		current_notice['gathering_address'] = noticeDB.gathering_address
 		current_notice['max_groupsize'] = noticeDB.max_groupsize
 		current_notice['gathering_moderator'] = noticeDB.gathering_moderator
 		current_notice['gathering_topic'] = noticeDB.gathering_topic
@@ -161,5 +202,20 @@ def read_current_notice():
 	
 	return current_notice
 	
+	
+def setdefaultnotice():
+	default_notice = {}
+	default_notice['gathering_topic'] = ''
+	default_notice['gathering_moderator'] = ''
+	default_notice['max_groupsize'] = '15'
+	default_notice['gathering_date'] = ''
+	default_notice['gathering_starttime'] = '10:00 AM'
+	default_notice['gathering_endtime'] = '11:30 AM'
+	default_notice['gathering_place'] = 'Bibliotique de Brossard'
+	default_notice['gathering_address'] = '7855 Ave San Francisco, Brossard J4X 2A4'
+	default_notice['registration_date'] = ''
+	default_notice['registration_time'] = ''
+	
+	return default_notice
 	
 	

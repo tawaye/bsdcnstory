@@ -1,4 +1,7 @@
 {% extends "./base.html" %}
 {% block content %}
-	<p>Uh-oh, something is wrong. {{ errmsg }}</p>
+	<p>Uh-oh, something is wrong.</p>
+	{% for err in errmsg %}
+		<p> {{ err }} </p>
+	{% endfor %}
 {% endblock %}

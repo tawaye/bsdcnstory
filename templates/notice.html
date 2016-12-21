@@ -1,11 +1,40 @@
 {% extends "./base.html" %}
 {% block content %}
 	
-	<div class="uk-panel uk-container-center uk-text-left" style="width:480px">
+	<div class="uk-panel uk-container-center uk-text-center">
 	{% if isactive %}
-		<h3>Notice of Next Story Gathering</h3>
-		<hr>
-		<p>Next story gathering will be held on {{ gathering_date }}, at {{ gathering_place }}</p>
+		<table class="uk-table" style="font-size: 30px">
+			<tr>
+				<td class="uk-width-1-4">Topic</td>
+				<td class="uk-width-3-4">{{ gathering_topic }}</td>
+			</tr>
+			<tr>
+				<td class="uk-width-1-4">Moderator</td>
+				<td class="uk-width-3-4">{{ gathering_moderator }}</td>
+			</tr>
+			<tr>
+				<td class="uk-width-1-4">Date/Time</td>
+				<td class="uk-width-3-4">{{ gathering_date }}, {{ gathering_starttime }} -- {{ gathering_endtime }}</td>
+			</tr>
+			<tr>
+				<td class="uk-width-1-4">Place</td>
+				<td class="uk-width-3-4">{{ gathering_place }}</td>
+			</tr>
+			<tr>
+				<td class="uk-width-1-4">Address</td>
+				<td class="uk-width-3-4">{{ gathering_address }}</td>
+			</tr>
+			<tr>
+				<td class="uk-width-1-4">Group Size</td>
+				<td class="uk-width-3-4">{{ max_groupsize }}</td>
+			</tr>
+			<tr>
+				<td class="uk-width-1-4">Registration Start Time</td>
+				<td class="uk-width-3-4">{{ registration_date}}, {{ registration_time }}</td>
+			</tr>
+		</table>	
+		<div class="uk-panel uk-margin-top">
+			<button class="uk-button uk-button-large"><a href="#" style="font-size: 26px">I want to attend</a></button>
 		</div>
 	{% else %}
 		<p> {{ errmsg }}</p>
