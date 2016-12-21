@@ -1,39 +1,21 @@
 {% extends "./base.html" %}
 {% block content %}
 	
-	<div class="uk-panel uk-container-center uk-text-center">
+	<div class="uk-panel uk-container-center uk-text-left">
 	{% if isactive %}
-		<table class="uk-table" style="font-size: 30px">
-			<tr>
-				<td class="uk-width-1-4">Topic</td>
-				<td class="uk-width-3-4">{{ gathering_topic }}</td>
-			</tr>
-			<tr>
-				<td class="uk-width-1-4">Moderator</td>
-				<td class="uk-width-3-4">{{ gathering_moderator }}</td>
-			</tr>
-			<tr>
-				<td class="uk-width-1-4">Date/Time</td>
-				<td class="uk-width-3-4">{{ gathering_date }}, {{ gathering_starttime }} -- {{ gathering_endtime }}</td>
-			</tr>
-			<tr>
-				<td class="uk-width-1-4">Place</td>
-				<td class="uk-width-3-4">{{ gathering_place }}</td>
-			</tr>
-			<tr>
-				<td class="uk-width-1-4">Address</td>
-				<td class="uk-width-3-4">{{ gathering_address }}</td>
-			</tr>
-			<tr>
-				<td class="uk-width-1-4">Group Size</td>
-				<td class="uk-width-3-4">{{ max_groupsize }}</td>
-			</tr>
-			<tr>
-				<td class="uk-width-1-4">Registration Start Time</td>
-				<td class="uk-width-3-4">{{ registration_date}}, {{ registration_time }}</td>
-			</tr>
-		</table>	
-		<div class="uk-panel uk-margin-top">
+		<p style="font-size: 30px; line-height: 120%">Next Brossard Story Time will be held on {{ gathering_date }}, from {{ gathering_starttime }} to {{ gathering_endtime }}. The venue will be:</p>
+		<p style="font-size: 24px; line-height: 120%">Venue: {{ gathering_place }} </br>
+		Address: {{ gathering_address }} </p>
+		<p style="font-size: 30px; line-height: 120%">The topic is {{ gathering_topic }} and The moderator is {{ gathering_moderator }}.</p>
+		<p style="font-size: 30px; line-height: 120%">The maximum group size is {{ max_groupsize }}. If the registration number exceeds this limit new registration will not be accepted. The start time of registration is
+{{ registration_date }}, {{ registration_time }}. You can only register after this time.</p>
+		<p style="font-size: 30px; line-height: 120%">There are currently {{ num_registration }} registrations. The list of attendees:</p>
+		<ur class="uk-list" style="font-size: 26px; line-height: 120%">
+			<li> name1 </li>
+			<li> name2 </li>
+			<li> name3 </li>
+		</ur>
+		<div class="uk-panel uk-margin-top uk-text-center">
 			<button class="uk-button uk-button-large"><a href="#" style="font-size: 26px">I want to attend</a></button>
 		</div>
 	{% else %}
