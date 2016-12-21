@@ -113,8 +113,8 @@ def shownotice(request):
 	gathering_date = current_notice['gathering_date']
 	if gathering_date != '' and datetime.strptime(gathering_date, '%Y-%m-%d').date() >= datetime.today().date():
 		context['isactive'] = True
-		context['title'] = 'Brossard Chinese Story Time ' + gathering_date	
-		context['heading'] = 'Brossard Chinese Story Time ' + gathering_date	
+		context['title'] = 'Brossard中文故事会 ' + gathering_date	
+		context['heading'] = 'Brossard中文故事会 ' + gathering_date	
 		context.update(current_notice)
 		return render(request, 'notice.html', context)
 	else:
@@ -211,7 +211,7 @@ def setdefaultnotice():
 	default_notice['gathering_date'] = ''
 	default_notice['gathering_starttime'] = '10:00 AM'
 	default_notice['gathering_endtime'] = '11:30 AM'
-	default_notice['gathering_place'] = 'Bibliotique de Brossard'
+	default_notice['gathering_place'] = 'Bibliotique de Brossard (Brossard图书馆儿童活动区)'
 	default_notice['gathering_address'] = '7855 Ave San Francisco, Brossard J4X 2A4'
 	default_notice['registration_date'] = ''
 	default_notice['registration_time'] = ''
