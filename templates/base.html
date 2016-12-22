@@ -12,12 +12,15 @@
 </head>
 <body class="">
 	<div class="uk-container uk-container-center uk-text-center uk-margin-top">
-		<div class="uk-block uk-box-large" style="background: url({% static 'xxx.jpg' %})">
-			<p style="font-size: 42px">{{ heading }}</p>
-			<hr>
+		<div class="uk-block uk-box-large uk-vertical-align" style="height: 260px; background-color: rgba(0, 0, 255, 0.3)">
+			<div class="uk-vertical-align-middle">
+			<p style="font-size: 45px">Brossard Chinese Story Time</p>
+			</div>
 		</div>
-	{% block content %}	
-	{% endblock %}
+		<div class="uk-panel" style="background-color: rgba(128, 128,128, 0.2)">
+		{% block content %}	
+		{% endblock %}
+		</div>
 	</div>
 </body>
 </html>

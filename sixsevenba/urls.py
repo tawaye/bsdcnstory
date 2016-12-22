@@ -26,4 +26,6 @@ urlpatterns = [
 	url(r'^chinesestory/logout/', views.adminlogout),
 	url(r'^chinesestory/notice/', views.shownotice),
 	url(r'^chinesestory/createnotice/', views.createnotice),
+	url(r'^chinesestory/registration/', views.registration),
+	url(r'^chinesestory/viewregistration/', views.viewregistration),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

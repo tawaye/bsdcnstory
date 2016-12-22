@@ -1,0 +1,44 @@
+{% extends "./base.html" %}
+{% block content %}
+	<div class="uk-panel uk-panel-box uk-container-center uk-text-left" style="width: 480px;">
+	<form class="uk-form uk-form-stacked" method="post" action="" style="font-size: 36px;">
+		{% csrf_token %}
+		<div class="uk-form-row">
+			<label class="uk-form-label">Parent Name</label>
+			<input name="parent_name" type="text" style="padding: 30px 10px;">
+		</div>
+		<div class="uk-form-row">
+			<label class="uk-form-label">Number of Children</label>
+			<select name="num_of_children" style="height: 48px">
+				<option selected>1</option>
+				<option>2</option>
+				<option>3</option>
+			</select>
+		</div>
+
+		<div class="uk-form-row">
+			<label class="uk-form-label">Child 1 Name</label>
+			<input name="child_name_1" type="text" style="padding: 30px 10px;">
+		</div>
+
+
+		<div class="uk-form-row">
+			<label class="uk-form-label">Child 2 Name</label>
+			<input name="child_name_2" type="text" style="padding: 30px 10px;">
+		</div>
+
+
+		<div class="uk-form-row">
+			<label class="uk-form-label">Child 3 Name</label>
+			<input name="child_name_3" type="text" style="padding: 30px 10px;">
+		</div>
+
+		<div class="uk-form-row">
+			<button name="registerme" class="uk-button uk-button-primary" style="font-size: 30px; width: 200px; height: 50px">Register Me</button>
+		</div>
+
+
+	</form>	
+	
+	</div>
+{% endblock %}

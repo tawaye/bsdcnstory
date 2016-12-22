@@ -1,7 +1,7 @@
 {% extends "./base.html" %}
 {% block content %}
 
-	<div class="uk-panel uk-container-center uk-text-left" style="width: 480px">
+	<div class="uk-panel uk-panel-box uk-container-center uk-text-left" style="width: 480px; border-width: 1px; border-style: solid;">
 
 	<h2>Create a new story gathering notice</h2>
 	<hr>
@@ -9,7 +9,7 @@
 		{% csrf_token %}
 		<div class="uk-form-row">
 			<label class="uk-form-label">Topic:</label>
-			<input name="gathering_topic" type="text" size="52" maxlength="40" value="{{ gathering_topic }}">
+			<input name="gathering_topic" type="text" size="52" maxlength="40" value="{{ gathering_topic }}" required>
 		</div>
 
 		<div class="uk-grid">
@@ -22,27 +22,27 @@
 			<div class="uk-width-1-2">
 				<div class="uk-form-row">
 					<label class="uk-form-label">Maximum group size:</label>
-					<input name="max_groupsize" type="text" value="{{ max_groupsize }}" >
+					<input name="max_groupsize" type="text" value="{{ max_groupsize }}" required>
 				</div>
 			</div>
 		</div>
 
 		<div class="uk-form-row">
 			<label class="uk-form-label">Date:</label>
-			<input name="gathering_date" type="text" value="{{ gathering_date }}" data-uk-datepicker="{format:'YYYY-MM-DD'}">
+			<input name="gathering_date" type="text" value="{{ gathering_date }}" data-uk-datepicker="{format:'YYYY-MM-DD'}" required>
 		</div>
 
 		<div class="uk-grid">
 			<div class="uk-width-1-2">
 				<div class="uk-form-row">
 					<label class="uk-form-label">Start Time</label>
-					<input name="gathering_starttime" type="text" value="{{ gathering_starttime }}" data-uk-timepicker="{format:'12h'}">
+					<input name="gathering_starttime" type="text" value="{{ gathering_starttime }}" data-uk-timepicker="{format:'12h'}" required>
 				</div>
 			</div>
 			<div class="uk-width-1-2">
 				<div class="uk-form-row">
 					<label class="uk-form-label">End Time</label>
-					<input name="gathering_endtime" type="text" value="{{ gathering_endtime }}" data-uk-timepicker="{format:'12h'}">
+					<input name="gathering_endtime" type="text" value="{{ gathering_endtime }}" data-uk-timepicker="{format:'12h'}" required>
 				</div>
 			</div>
 		</div>
@@ -60,13 +60,13 @@
 			<div class="uk-width-1-2">
 				<div class="uk-form-row">
 					<label class="uk-form-label">Registration Date:</label>
-					<input name="registration_date" type="text" value="{{ registration_date }}" data-uk-datepicker="{format:'YYYY-MM-DD'}">
+					<input name="registration_date" type="text" value="{{ registration_date }}" data-uk-datepicker="{format:'YYYY-MM-DD'}" required>
 				</div>
 			</div>
 			<div class="uk-width-1-2">
 				<div class="uk-form-row">
 					<label class="uk-form-label">Time</label>
-					<input name="registration_time" type="text" value="{{ registration_time }}" data-uk-timepicker="{format:'12h'}">
+					<input name="registration_time" type="text" value="{{ registration_time }}" data-uk-timepicker="{format:'12h'}" required>
 				</div>
 			</div>
 		</div>

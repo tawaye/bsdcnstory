@@ -1,0 +1,17 @@
+{% extends "./base.html" %}
+{% block content %}
+
+	<div class="uk-panel uk-panel-box uk-container-center uk-text-left" style="width: 480px">
+	{% if authenticated %}
+		<h2>Current Registration ( {{ gathering_date }}):</h2>
+		<h3>There are in total {{ registration_count }} registrations.</h3>		
+		<ur class="uk-list" style="font-size: 26px; line-height: 38px;">
+			{% for reg in registration_list %}
+				<li>{{ reg.parent_name }} ( {{ reg.num_of_children }} ): {{ reg.child_name_1 }}, {{ reg.child_name_2 }}, {{ reg.child_name_3 }} </li>
+			{% endfor %}
+	{% else %}
+		{{ errmsg }}
+	{% endif %}
+	</div>
+
+{% endblock %}

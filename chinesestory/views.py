@@ -22,8 +22,8 @@ errmsg = [
 	'The end_time is not valid', # errcode = 3
 	'The end_time cannot be earlier than start_time', # errcode = 4
 	'The max group size is not valid', # errcode = 5
-	'', # errcode = 6
-	'', # errcode = 7
+	'Invalid registration start date', # errcode = 6
+	'Invalid registartion start time', # errcode = 7
 	'', # errcode = 8
 	'Unspecified error', # errcode = 9
 ]
@@ -51,7 +51,7 @@ def adminlogin(request):
 				return render(request, 'adminlogin.html', context)
 	else:
 		context['authenticated'] = False
-		context['errmsg'] = ''
+		context['errmsg'] = 'Please log in as admin'
 		return render(request, 'adminlogin.html', context)
 
 
@@ -59,7 +59,19 @@ def adminlogout(request):
 	logout(request)
 	return redirect('/chinesestory/admin/')
 
-
+def viewregistration(request):
+	context = {}
+	if request.user.is_authenticated:
+		context['authenticated'] = True
+		context['username'] = request.user.username
+		notice = read_current_notice()
+		regData = readRegistrationData()
+		context['gathering_date'] = notice['gathering_date']
+		context['registration_count'] = regData['count']	
+		context['registration_list'] = regData['regList']	
+		
+		return render(request, 'viewregistration.html', context)
+		
 def createnotice(request):
 	current_notice = {}
 	context = {}
@@ -110,18 +122,60 @@ def shownotice(request):
 	context = {}
 	context['isadmin'] = False
 	current_notice = read_current_notice()
+	regData = readRegistrationData()
 	gathering_date = current_notice['gathering_date']
 	if gathering_date != '' and datetime.strptime(gathering_date, '%Y-%m-%d').date() >= datetime.today().date():
 		context['isactive'] = True
 		context['title'] = 'Brossard中文故事会 ' + gathering_date	
 		context['heading'] = 'Brossard中文故事会 ' + gathering_date	
+		regDate = datetime.strptime(current_notice['registration_date'], '%Y-%m-%d').date()
+		regTime = datetime.strptime(current_notice['registration_time'], '%I:%M %p').time()
+		if checkRegistrationTime(regDate, regTime):
+			context['registration_allowed'] = True
+		else:
+			context['registration_allowed'] = False
+		context['registration_count'] = regData['count']
+		context['registration_list'] = regData['regList']
 		context.update(current_notice)
 		return render(request, 'notice.html', context)
 	else:
 		context['errmsg'] = 'There is no active notice' + gathering_date 
 		return render(request, 'notice.html', context)
 
-
+def registration(request):
+	context = {}
+	errmsgs = []
+	regData = {}
+	current_notice = read_current_notice()
+	regDate = datetime.strptime(current_notice['registration_date'], '%Y-%m-%d').date()	
+	regTime = datetime.strptime(current_notice['registration_time'], '%I:%M %p').time()	
+	if not checkRegistrationTime(regDate, regTime):
+		errmsgs.append('Too early. Please come back later.')
+		context['errmsg'] = errmsgs
+		return render(request, 'error.html', context)
+	if request.POST:
+		regData['parent_name'] = request.POST['parent_name']	
+		regData['num_of_children'] = request.POST['num_of_children']	
+		regData['child_name_1'] = request.POST['child_name_1']	
+		regData['child_name_2'] = request.POST['child_name_2']	
+		regData['child_name_3'] = request.POST['child_name_3']	
+		if checkRegistrationLimit():
+			if checkRegistrationDuplicate(regData['parent_name']):
+				saveRegistrationData(regData)
+				context['successMsg'] = 'Your registration is accepted.'
+				return render(request, 'succeed.html', context)
+			else:
+				errmsgs.append('The name ' + regData['parent_name'] + 'has already been registered.')	
+				context['errmsg'] = errmsgs
+				return render(request, 'error.html', context)
+		else:
+			errmsgs.append('The registration number has reached the limit. New registration is not accpeted')	
+			context['errmsg'] = errmsgs
+			return render(request, 'error.html', context)
+	else:
+		context['heading'] = 'Brossard Chinese Story registration'
+		return render(request, 'registration.html', context)
+	
 def checknotice(notice):
 	errmsgs = []
 	try:
@@ -129,6 +183,14 @@ def checknotice(notice):
 		if pDate.date() < datetime.today().date():
 			errcode = 1
 			errmsgs.append(errmsg[errcode])
+		try:
+			pRegDate = datetime.strptime(notice['registration_date'], '%Y-%m-%d')
+			if pRegDate >= pDate:
+				errcode = 6
+				errmsgs.apped(errmsg[errocode])
+		except ValueError:
+			errocode = 6
+			errmsgs.apped(errmsg[errocode])
 	except ValueError:
 		errcode = 1
 		errmsgs.append(errmsg[errcode])
@@ -150,6 +212,12 @@ def checknotice(notice):
 			errmsgs.append(errmsg[errcode])
 	except ValueError:
 		errcode = 5
+		errmsgs.append(errmsg[errcode])
+
+	try:
+		pRegTime = datetime.strptime(notice['registration_time'], "%I:%M %p")
+	except ValueError:
+		errcode = 7
 		errmsgs.append(errmsg[errcode])
 
 	return errmsgs
@@ -196,7 +264,7 @@ def read_current_notice():
 		current_notice['gathering_endtime'] = ''
 		current_notice['gathering_place'] = ''
 		current_notice['gathering_moderator'] = ''
-		current_notice['gethering_topic'] = ''
+		current_notice['gathering_topic'] = ''
 		current_notice['registration_date'] = ''
 		current_notice['registration_time'] = ''
 	
@@ -217,5 +285,68 @@ def setdefaultnotice():
 	default_notice['registration_time'] = ''
 	
 	return default_notice
+	
+	
+def checkRegistrationTime(regDate, regTime):
+	if datetime.now().date() > regDate:
+		return True
+	elif (datetime.now().date() == regDate and datetime.now().time() > regTime):
+		return True
+	else:
+		return False
+
+def checkRegistrationLimit():
+	noticeData = read_current_notice()
+	regLimit = noticeData['max_groupsize']
+	regCount = Current_Registration.objects.all().count()
+	if regCount >= regLimit:
+		return False
+	else:
+		return True
+
+def checkRegistrationDuplicate(name):
+	if Current_Registration.objects.filter(parent_name=name).count() > 0:
+		return False
+	else:
+		return True
+	
+def saveRegistrationData(regData):
+	new_registration = Current_Registration(
+		parent_name = regData['parent_name'],
+		num_of_children = int(regData['num_of_children']),
+		child_name_1 = regData['child_name_1'],
+		child_name_2 = regData['child_name_2'],
+		child_name_3 = regData['child_name_3']
+	)
+	new_registration.save()
+	return	
+
+def readRegistrationData():
+	regData = {}
+	regList = []
+	regCount = Current_Registration.objects.all().count()
+	if regCount >=1:
+		ii = 0
+		while ii < regCount:
+			parent_name = Current_Registration.objects.all()[ii].parent_name		
+			num_of_children = Current_Registration.objects.all()[ii].num_of_children
+			child_name_1 = Current_Registration.objects.all()[ii].child_name_1
+			child_name_2 = Current_Registration.objects.all()[ii].child_name_2
+			child_name_3 = Current_Registration.objects.all()[ii].child_name_3
+			record = {
+				'parent_name': parent_name,
+				'num_of_children': num_of_children,
+				'child_name_1': child_name_1,
+				'child_name_2': child_name_2,
+				'child_name_3': child_name_3
+			}
+			regList.append(record)
+			ii = ii + 1
+
+	regData['count'] = regCount
+	regData['regList'] = regList	
+	return regData
+
+
 	
 	

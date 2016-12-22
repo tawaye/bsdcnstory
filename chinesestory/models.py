@@ -13,3 +13,11 @@ class Current_Notice(models.Model):
 	gathering_topic = models.CharField(max_length = 40)
 	registration_date = models.CharField(max_length = 12)
 	registration_time = models.CharField(max_length = 12)
+
+class Current_Registration(models.Model):
+	parent_name = models.CharField(max_length = 20)
+	num_of_children = models.IntegerField(default = 1)	
+	child_name_1 = models.CharField(max_length = 20)
+	child_name_2 = models.CharField(max_length = 20)
+	child_name_3 = models.CharField(max_length = 20)
+
