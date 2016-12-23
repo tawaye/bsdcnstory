@@ -99,6 +99,7 @@ def createnotice(request):
 			if len(errmsgs) == 0: 
 				context['isadmin'] = True
 				context['isactive'] = True
+				context['heading'] = 'Admin function - preview notice'
 				context.update(current_notice)
 				record_current_notice(current_notice)
 				return render(request, 'notice.html', context)
@@ -120,7 +121,9 @@ def createnotice(request):
 			return render(request, 'error.html', {})
 	else:
 		default_notice = setdefaultnotice()
-		return render(request, 'createnotice.html', default_notice)
+		context['heading'] = 'Admin Function - create notice'
+		context.update(default_notice)
+		return render(request, 'createnotice.html', context)
 
 def shownotice(request):
 	context = {}
