@@ -73,6 +73,8 @@ def viewregistration(request):
 		context['registration_list'] = regData['regList']	
 		
 		return render(request, 'viewregistration.html', context)
+	else:
+		return render(request, 'notloggedin.html')
 		
 def createnotice(request):
 	current_notice = {}
