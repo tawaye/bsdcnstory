@@ -33,7 +33,7 @@ def adminlogin(request):
 	if request.user.is_authenticated:
 		context['authenticated'] = True
 		context['username'] = request.user.username
-		context['heading'] = 'admin function'
+		context['heading'] = '管理员功能'
 		return render(request, 'adminlogin.html', context)
 		
 	elif request.POST:
@@ -44,7 +44,7 @@ def adminlogin(request):
 			if user is not None:
 				login(request, user)
 				context['authenticated'] = True
-				context['heading'] = 'admin function'
+				context['heading'] = '管理员功能'
 				context['username'] = request.user.username
 				return render(request, 'adminlogin.html', context)
 			else:
@@ -53,7 +53,7 @@ def adminlogin(request):
 				return render(request, 'adminlogin.html', context)
 	else:
 		context['authenticated'] = False
-		context['errmsg'] = 'Please log in as admin'
+		context['heading'] = '管理员登录'
 		return render(request, 'adminlogin.html', context)
 
 
