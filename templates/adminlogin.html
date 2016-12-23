@@ -1,15 +1,17 @@
 {% extends "./base.html" %}
 {% block content %}
 
-	<div class="uk-panel uk-panel-box uk-container-center uk-text-left" style="width: 600px">
+	<div class="uk-panel uk-panel-box uk-container-center uk-text-left" style="width: 600px;">
 
 	{% if authenticated %}
-		<p>您已经以 '{{ username }}' 登录. 您现在可以:</p>
-		<ul class="uk-list uk-list-space">
+		<p style="font-size: 32px;">您已经以 '{{ username }}' 登录. 您现在可以:</p>
+		<div style="padding-top: 20px; padding-left: 20px;">
+		<ul class="uk-list uk-list-space" style="font-size: 32px; line-height: 150%;">
 			<li><a href="/chinesestory/createnotice">创建新的故事会通知</a></li>
 			<li><a href="/chinesestory/viewregistration">查看当前报名情况</a></li>
 			<li><a href="/chinesestory/logout">退出登录</a></li>
 		</ul>
+		</div>
 	{% else %}
 	<h2>管理员登录</h2>
 	<p>{{ errmsg }}</p>
