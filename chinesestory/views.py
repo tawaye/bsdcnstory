@@ -53,6 +53,7 @@ def adminlogin(request):
 				return render(request, 'adminlogin.html', context)
 	else:
 		context['authenticated'] = False
+		context['title'] = 'Brossard中文故事会-管理员登录'
 		context['heading'] = '管理员登录'
 		return render(request, 'adminlogin.html', context)
 
@@ -134,7 +135,7 @@ def shownotice(request):
 	if gathering_date != '' and datetime.strptime(gathering_date, '%Y-%m-%d').date() >= datetime.today().date():
 		context['isactive'] = True
 		context['title'] = 'Brossard中文故事会 ' + gathering_date	
-		context['heading'] = 'Brossard中文故事会 ' + gathering_date	
+		context['heading'] = '故事会通知 ' + gathering_date	
 		regDate = datetime.strptime(current_notice['registration_date'], '%Y-%m-%d').date()
 		regTime = datetime.strptime(current_notice['registration_time'], '%I:%M %p').time()
 		if checkRegistrationTime(regDate, regTime):
