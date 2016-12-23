@@ -5,64 +5,64 @@
 
 	<form class="uk-form uk-form-stacked" method="post" action="" style="font-size: 30px; line-height: 150%">
 		{% csrf_token %}
-		<div class="uk-form-row">
+		<div class="uk-form-row uk-margin-top">
 			<label class="uk-form-label">故事会主题</label>
 			<input name="gathering_topic" type="text" size="52" maxlength="40" value="{{ gathering_topic }}" required style="height: 45px; line-height: 150%;">
 		</div>
 
 		<div class="uk-grid">
 			<div class="uk-width-1-2">
-				<div class="uk-form-row">
+				<div class="uk-form-row uk-margin-top">
 					<label class="uk-form-label">主持人</label>
 					<input name="gathering_moderator" type="text" value="{{ gathering_moderator }}" style="height: 45px; line-height: 150%;">
 				</div>
 			</div>
 			<div class="uk-width-1-2">
-				<div class="uk-form-row">
+				<div class="uk-form-row uk-margin-top">
 					<label class="uk-form-label">最大参与人数（儿童）</label>
 					<input name="max_groupsize" type="text" value="{{ max_groupsize }}" required style="height: 45px; line-height: 150%;">
 				</div>
 			</div>
 		</div>
 
-		<div class="uk-form-row">
+		<div class="uk-form-row uk-margin-top">
 			<label class="uk-form-label">故事会日期</label>
 			<input name="gathering_date" type="text" value="{{ gathering_date }}" data-uk-datepicker="{format:'YYYY-MM-DD'}" required style="height: 45px; line-height: 150%;">
 		</div>
 
 		<div class="uk-grid">
 			<div class="uk-width-1-2">
-				<div class="uk-form-row">
+				<div class="uk-form-row uk-margin-top">
 					<label class="uk-form-label">开始时间</label>
 					<input name="gathering_starttime" type="text" value="{{ gathering_starttime }}" data-uk-timepicker="{format:'12h'}" required style="height: 45px; line-height: 150%;">
 				</div>
 			</div>
 			<div class="uk-width-1-2">
-				<div class="uk-form-row">
+				<div class="uk-form-row uk-margin-top">
 					<label class="uk-form-label">结束时间</label>
 					<input name="gathering_endtime" type="text" value="{{ gathering_endtime }}" data-uk-timepicker="{format:'12h'}" required style="height: 45px; line-height: 150%;">
 				</div>
 			</div>
 		</div>
 
-		<div class="uk-form-row">
+		<div class="uk-form-row uk-margin-top">
 			<label class="uk-form-label">故事会地点</label>
 			<input name="gathering_place" type="text" size="52" maxlength="50" value="{{ gathering_place }}" style="height: 45px; line-height: 150%;">
 		</div>
-		<div class="uk-form-row">
+		<div class="uk-form-row uk-margin-top">
 			<label class="uk-form-label">地址</label>
 			<input name="gathering_address" type="text" size="52" maxlength="50" value="{{ gathering_address }}" style="height: 45px; line-height: 150%;">
 		</div>
 		
 		<div class="uk-grid">
-			<div class="uk-width-1-2">
+			<div class="uk-width-1-2 uk-margin-top">
 				<div class="uk-form-row" style="padding-top: 60px;">
 					<label class="uk-form-label">报名启动日期</label>
 					<input name="registration_date" type="text" value="{{ registration_date }}" data-uk-datepicker="{format:'YYYY-MM-DD'}" required style="height: 45px; line-height: 150%;">
 				</div>
 			</div>
 			<div class="uk-width-1-2">
-				<div class="uk-form-row" style="padding-top: 60px;">
+				<div class="uk-form-row uk-margin-top" style="padding-top: 60px;">
 					<label class="uk-form-label">时间</label>
 					<input name="registration_time" type="text" value="{{ registration_time }}" data-uk-timepicker="{format:'12h'}" required style="height: 45px; line-height: 150%;">
 				</div>

@@ -1,37 +1,40 @@
 {% extends "./base.html" %}
 {% block content %}
 	
-	<div class="uk-panel uk-panel-box uk-container-center uk-text-left">
+	<div class="uk-panel uk-panel-box uk-container-center uk-text-left" style="width:700px; padding: 40px;">
 	{% if isactive %}
-		<p style="font-size: 30px; line-height: 120%">下一期中文故事会将于{{ gathering_date }}， {{ gathering_starttime }} -- {{ gathering_endtime }} 在以下地点举行：</p>
-		<p style="font-size: 24px; line-height: 120%">{{ gathering_place }} </br>
-		{{ gathering_address }} </p>
+		<p style="font-size: 30px; line-height: 120%">下一期中文故事会将于</p>
+		<p style="font-size: 24px; line-height: 80%; text-indent: 60px;">{{ gathering_date }}, {{ gathering_starttime }} -- {{ gathering_endtime }} </p>
+		<p style="font-size: 30px; line-height: 120%">在以下地点举行：</p>
+		<p style="font-size: 24px; line-height: 80%; text-indent: 60px;">{{ gathering_place }} </p>
+		<p style="font-size: 24px; line-height: 80%; text-indent: 60px;">{{ gathering_address }} </p>
 		<p style="font-size: 30px; line-height: 120%">本期故事会主题为《 {{ gathering_topic }} 》，由{{ gathering_moderator }}主持。</p>
 		<p style="font-size: 30px; line-height: 120%">最大参与儿童人数为 {{ max_groupsize }} 人。报名人数达到限额后将停止报名。每位家长最多可带3名儿童。报名启动时间为
 {{ registration_date }}， {{ registration_time }}。您只能在此时间以后报名。</p>
 		<p style="font-size: 30px; line-height: 120%">当前已有 {{ registration_count }} 名儿童报名。</p>
-		<ur class="uk-list" style="font-size: 26px; line-height: 120%">
+		<ur class="uk-list" style="font-size: 20px; line-height: 120%;">
 		{% for reg in registration_list %}
-			<li> {{ reg.parent_name }} ( {{ reg.num_of_children }} )</li>
+			<li style="padding-left: 60px;"> {{ reg.parent_name }} ( {{ reg.num_of_children }} )</li>
 		{% endfor %}
 		</ur>
-		<div class="uk-panel uk-margin-top uk-text-center">
+		<div class="uk-panel uk-text-center" style="padding-top: 100px">
 			{% if registration_allowed %}
 			<button class="uk-button uk-button-large uk-button-primary" style="font-size: 26px"><a href="/chinesestory/registration">我要报名</a></button>
 			{% else %}
 			<p>Too early. Please come back and refresh the page after {{ registration_date }}, {{registration_time }}</p>
-			<button class="uk-button uk-button-large" style="font-size: 26px">我要报名</button>
+			<button class="uk-button uk-button-large" style="width: 180px; height: 60px; font-size: 30px">我要报名</button>
 			{% endif %}
 		</div>
+	</div>
 	{% else %}
 		<p> {{ errmsg }}</p>
 	{% endif %}
 	{% if isadmin %}
-	<div class="uk-panel uk-container-center uk-text-center" style="width:480px">
+	<div class="uk-panel uk-container-center uk-text-center" style="padding-top: 60px;">
 		<form class="uk-form" method="post">
 		{% csrf_token %}
-		<button name="publishnotice" class="uk-button uk-button-primary">Publish</button>
-		<button name="modifynotice" class="uk-button uk-button-primary">Modify</button>
+		<button name="publishnotice" class="uk-button uk-button-primary" style="width: 180px; height: 60px; font-size: 30px;">Publish</button>
+		<button name="modifynotice" class="uk-button uk-button-primary" style="width: 180px; height: 60px; font-size: 30px;">Modify</button>
 		</form>
 	</div>
 	{% endif %}

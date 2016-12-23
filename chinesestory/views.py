@@ -194,10 +194,10 @@ def checknotice(notice):
 			pRegDate = datetime.strptime(notice['registration_date'], '%Y-%m-%d')
 			if pRegDate >= pDate:
 				errcode = 6
-				errmsgs.apped(errmsg[errocode])
+				errmsgs.append(errmsg[errcode])
 		except ValueError:
-			errocode = 6
-			errmsgs.apped(errmsg[errocode])
+			errcode = 6
+			errmsgs.apped(errmsg[errcode])
 	except ValueError:
 		errcode = 1
 		errmsgs.append(errmsg[errcode])
