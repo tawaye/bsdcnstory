@@ -17,19 +17,19 @@
 		<form class="uk-form uk-form-stacked" method="post" style="font-size: 30px; line-height: 120%">
 			{% csrf_token %}
 			<div class="uk-form-row">
-				<label class="uk-form-label">User Name:</label>
+				<label class="uk-form-label">用户名：</label>
 				<div class="uk-form-controls">
 					<input name="username" type="text" required placeholder="" style="height: 45px; line-height: 150%">
 				</div>
 			</div>
 			<div class="uk-form-row">
-				<label class="uk-form-label">Password:</label>
+				<label class="uk-form-label">密 码：</label>
 				<div class="uk-form-controls">
 					<input name="password" type="password" required placeholder="" style="height: 45px; line-height: 150%">
 				</div>
 			</div>
 			<div class="uk-form-row">
-				<button name="adminlogin" class="uk-button uk-button-primary" style="width: 180px; height: 60px; font-size: 30px;">Login</button>
+				<button name="adminlogin" class="uk-button uk-button-primary" style="width: 180px; height: 60px; font-size: 30px;">登 录</button>
 			</div>
 		</form>
 	{% endif  %}
