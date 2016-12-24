@@ -2,7 +2,8 @@ from django.db import models
 
 # Create your models here.
 class Current_Notice(models.Model):
-	notice_number = models.IntegerField(primary_key=True)
+	published = models.BooleanField()
+	district = models.CharField(max_length = 12, primary_key=True) 
 	gathering_date = models.CharField(max_length = 12)
 	gathering_starttime = models.CharField(max_length = 12)
 	gathering_endtime = models.CharField(max_length = 12)
@@ -14,7 +15,10 @@ class Current_Notice(models.Model):
 	registration_date = models.CharField(max_length = 12)
 	registration_time = models.CharField(max_length = 12)
 
+
 class Current_Registration(models.Model):
+	district = models.CharField(max_length = 12)
+	gathering_date = models.CharField(max_length = 12)
 	parent_name = models.CharField(max_length = 20)
 	num_of_children = models.IntegerField(default = 1)	
 	child_name_1 = models.CharField(max_length = 20)

@@ -22,9 +22,12 @@ from chinesestory import views
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
 	url(r'^$', views.adminlogin),
+	url(r'^chinesestory/', views.index),
 	url(r'^chinesestory/admin/', views.adminlogin),
 	url(r'^chinesestory/logout/', views.adminlogout),
-	url(r'^chinesestory/notice/', views.shownotice),
+	url(r'^chinesestory/brossard/', views.shownotice),
+	url(r'^chinesestory/longueuil/', views.shownotice),
+	url(r'^chinesestory/montreal/', views.shownotice),
 	url(r'^chinesestory/createnotice/', views.createnotice),
 	url(r'^chinesestory/registration/', views.registration),
 	url(r'^chinesestory/viewregistration/', views.viewregistration),

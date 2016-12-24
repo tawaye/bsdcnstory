@@ -14,6 +14,11 @@ from chinesestory.models import *
 # Create your views here.
 
 notice_file_path = '/home/tawayee/6677ba-env/sixsevenba/chinesestory/noticefiles/' 
+district_name = {
+	'bsdadmin': 'Brossard',
+	'logadmin': 'Longueuil',
+	'mtladmin': 'Montreal',
+}
 
 errmsg = [
 	'Success', # errcode = 0
@@ -28,11 +33,18 @@ errmsg = [
 	'Unspecified error', # errcode = 9
 ]
 
+def index(request):
+	context = {}
+	context['title'] = 'Chinese Story Time'
+	return render(request, 'chinesestory.html', context)
+
 def adminlogin(request):
 	context = {}
 	if request.user.is_authenticated:
 		context['authenticated'] = True
-		context['username'] = request.user.username
+		username = request.user.username
+		context['username'] = username
+		context['district_name'] = district_name[username]
 		context['heading'] = '管理员功能'
 		return render(request, 'adminlogin.html', context)
 		
@@ -44,6 +56,7 @@ def adminlogin(request):
 			if user is not None:
 				login(request, user)
 				context['authenticated'] = True
+				context['district_name'] = district_name[username]
 				context['heading'] = '管理员功能'
 				context['username'] = request.user.username
 				return render(request, 'adminlogin.html', context)
@@ -66,9 +79,11 @@ def viewregistration(request):
 	context = {}
 	if request.user.is_authenticated:
 		context['authenticated'] = True
-		context['username'] = request.user.username
-		notice = read_current_notice()
-		regData = readRegistrationData()
+		username = request.user.username
+		context['username'] = username
+		district = district_name[username] 
+		notice = read_current_notice(district)
+		regData = readRegistrationData(district)
 		context['gathering_date'] = notice['gathering_date']
 		context['registration_count'] = regData['count']	
 		context['registration_list'] = regData['regList']	
@@ -83,9 +98,15 @@ def createnotice(request):
 	if not request.user.is_authenticated:
 		return render(request, 'notloggedin.html')
 	elif request.POST:
+		username = request.user.username
+		district = district_name[username]
+		context['district_name'] = district
+		
 		if 'previewnotice' in request.POST:
 			context['isadmin'] = True
 			context['isactive'] = True	
+			current_notice['published'] = False
+			current_notice['district'] = district
 			current_notice['gathering_date'] = request.POST['gathering_date']
 			current_notice['gathering_starttime'] = request.POST['gathering_starttime']
 			current_notice['gathering_endtime'] = request.POST['gathering_endtime']
@@ -108,19 +129,26 @@ def createnotice(request):
 				context['errmsg'] = errmsgs
 				return render(request, 'error.html', context)
 		elif 'publishnotice' in request.POST:
-			current_notice = read_current_notice()
+			current_notice = read_current_notice(district)
+			current_notice['published'] = True
+			record_current_notice(current_notice)
+			current_registration = readRegistrationData(district)
 			gathering_date = current_notice['gathering_date']
-			notice_file = notice_file_path + gathering_date + '.json'
+			notice_file = notice_file_path + district + '-' + gathering_date + '.json'
 			pFile = open(notice_file, 'w')
 			pFile.write(json.dumps(current_notice))
+			pFile.write(json.dumps(current_registration))
+			clearRegistrationData(district)
 			pFile.close()
 			return render(request, 'succeed.html', {})
 		elif 'modifynotice' in request.POST:
-			current_notice = read_current_notice()
+			current_notice = read_current_notice(district)
 			return render(request, 'createnotice.html', current_notice) 
 		else:
 			return render(request, 'error.html', {})
 	else:
+		username = request.user.username
+		context['district_name'] = district_name[username]
 		default_notice = setdefaultnotice()
 		context['heading'] = '管理员功能 - 创建新故事会通知'
 		context.update(default_notice)
@@ -233,7 +261,8 @@ def checknotice(notice):
 
 def record_current_notice(notice):
 	current_notice = Current_Notice(
-		notice_number = 6677,
+		district = notice['district'],
+		published = notice['published'],
 		gathering_date = notice['gathering_date'],
 		gathering_starttime = notice['gathering_starttime'],
 		gathering_endtime = notice['gathering_endtime'],
@@ -250,11 +279,12 @@ def record_current_notice(notice):
 	current_notice.save()
 	
 	
-def read_current_notice():
+def read_current_notice(district_name):
 	current_notice = {}
-	count = Current_Notice.objects.all().count()
+	count = Current_Notice.objects.filter(district=district_name).count()
 	if count >= 1:
-		noticeDB = Current_Notice.objects.all()[0]
+		noticeDB = Current_Notice.objects.filter(district=district_name)[0]
+		current_notice['published'] = noticeDB.published
 		current_notice['gathering_date'] = noticeDB.gathering_date
 		current_notice['gathering_starttime'] = noticeDB.gathering_starttime
 		current_notice['gathering_endtime'] = noticeDB.gathering_endtime
@@ -281,6 +311,8 @@ def read_current_notice():
 	
 def setdefaultnotice():
 	default_notice = {}
+	
+	default_notice['district'] = ''
 	default_notice['gathering_topic'] = ''
 	default_notice['gathering_moderator'] = ''
 	default_notice['max_groupsize'] = '15'
@@ -329,18 +361,19 @@ def saveRegistrationData(regData):
 	new_registration.save()
 	return	
 
-def readRegistrationData():
+def readRegistrationData(district_name):
 	regData = {}
 	regList = []
-	regCount = Current_Registration.objects.all().count()
+	regDB = Current_Registration.objects.filter(district=district_name)
+	regCount = regDB.count()
 	if regCount >=1:
 		ii = 0
 		while ii < regCount:
-			parent_name = Current_Registration.objects.all()[ii].parent_name		
-			num_of_children = Current_Registration.objects.all()[ii].num_of_children
-			child_name_1 = Current_Registration.objects.all()[ii].child_name_1
-			child_name_2 = Current_Registration.objects.all()[ii].child_name_2
-			child_name_3 = Current_Registration.objects.all()[ii].child_name_3
+			parent_name = regDB[ii].parent_name		
+			num_of_children = regDB[ii].num_of_children
+			child_name_1 = regDB[ii].child_name_1
+			child_name_2 = regDB[ii].child_name_2
+			child_name_3 = regDB[ii].child_name_3
 			record = {
 				'parent_name': parent_name,
 				'num_of_children': num_of_children,
@@ -355,6 +388,10 @@ def readRegistrationData():
 	regData['regList'] = regList	
 	return regData
 
+def clearRegistrationData(district_name):
+	regDB = Current_Registration.objects.filter(district=district_name)
+	regDB.delete()
+	return
 
 	
 	
