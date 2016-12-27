@@ -121,3 +121,7 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 STATIC_ROOT = '/var/www/6677ba.ca/static'
+MEDIA_URL = '/images/'
+MEDIA_ROOT = '/var/www/6677ba.ca/images'
+MEDIA_URL = '/images/'
+

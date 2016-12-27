@@ -11,12 +11,25 @@
 		<p style="font-size: 30px; line-height: 120%">本期故事会主题为《 {{ gathering_topic }} 》，由{{ gathering_moderator }}主持。</p>
 		<p style="font-size: 30px; line-height: 120%">最大参与儿童人数为 {{ max_groupsize }} 人。报名人数达到限额后将停止报名。每位家长最多可带3名儿童。报名启动时间为
 {{ registration_date }}， {{ registration_time }}。您只能在此时间以后报名。</p>
+
+		{% for this_activity in activity_list %}
+			{% if this_activity.exist %}
+				<p style="font-size: 30px; line-height: 120%;">{{ this_activity.activity_name }}</p>
+				<p style="font-size: 24px; line-height: 80%;"> {{ this_activity.activity_info }}</p>
+				{% if this_activity.activity_img_exist %}
+					<img src="{{ this_activity.activity_img_url }}"></img>
+				{% endif %}
+			{% endif %}
+		{% endfor %}
+		
+
+
 		<p style="font-size: 30px; line-height: 120%">当前已有 {{ registration_count }} 名儿童报名。</p>
-		<ur class="uk-list" style="font-size: 20px; line-height: 120%;">
+		<ul class="uk-list" style="font-size: 20px; line-height: 120%;">
 		{% for reg in registration_list %}
 			<li style="padding-left: 60px;"> {{ reg.parent_name }} ( {{ reg.num_of_children }} )</li>
 		{% endfor %}
-		</ur>
+		</ul>
 		<div class="uk-panel uk-text-center" style="padding-top: 100px">
 			{% if registration_allowed %}
 			<button class="uk-button uk-button-large uk-button-primary" style="font-size: 26px"><a href="/chinesestory/registration">我要报名</a></button>
@@ -25,7 +38,7 @@
 			<button class="uk-button uk-button-large" style="width: 180px; height: 60px; font-size: 30px">我要报名</button>
 			{% endif %}
 		</div>
-	</div>
+
 	{% else %}
 		<p> {{ errmsg }}</p>
 	{% endif %}
@@ -38,4 +51,6 @@
 		</form>
 	</div>
 	{% endif %}
+	
+	</div>
 {% endblock %}

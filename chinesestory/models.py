@@ -14,6 +14,32 @@ class Current_Notice(models.Model):
 	gathering_topic = models.CharField(max_length = 40)
 	registration_date = models.CharField(max_length = 12)
 	registration_time = models.CharField(max_length = 12)
+	activity_1_exist = models.BooleanField()
+	activity_1_info = models.CharField(max_length = 300)
+	activity_1_img = models.CharField(max_length = 80)
+	activity_1_img_exist = models.BooleanField()
+	activity_2_exist = models.BooleanField()
+	activity_2_info = models.CharField(max_length = 300)
+	activity_2_img = models.CharField(max_length = 80)
+	activity_2_img_exist = models.BooleanField()
+	activity_3_exist = models.BooleanField()
+	activity_3_info = models.CharField(max_length = 300)
+	activity_3_img = models.CharField(max_length = 80)
+	activity_3_img_exist = models.BooleanField()
+	activity_4_exist = models.BooleanField()
+	activity_4_info = models.CharField(max_length = 300)
+	activity_4_img = models.CharField(max_length = 80)
+	activity_4_img_exist = models.BooleanField()
+	activity_5_exist = models.BooleanField()
+	activity_5_info = models.CharField(max_length = 300)
+	activity_5_img = models.CharField(max_length = 80)
+	activity_6_exist = models.BooleanField()
+	activity_5_img_exist = models.BooleanField()
+	activity_6_info = models.CharField(max_length = 300)
+	activity_6_img = models.CharField(max_length = 80)
+	activity_6_img_exist = models.BooleanField()
+	
+
 
 
 class Current_Registration(models.Model):

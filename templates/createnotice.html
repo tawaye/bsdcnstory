@@ -3,7 +3,7 @@
 
 	<div class="uk-panel uk-panel-box uk-container-center uk-text-left" style="width: 700px; padding: 40px;">
 
-	<form class="uk-form uk-form-stacked" method="post" action="" style="font-size: 30px; line-height: 150%">
+	<form class="uk-form uk-form-stacked" method="post" action="" enctype="multipart/form-data" style="font-size: 30px; line-height: 150%">
 		{% csrf_token %}
 		<div class="uk-form-row uk-margin-top">
 			<label class="uk-form-label">故事会主题</label>
@@ -68,7 +68,51 @@
 				</div>
 			</div>
 		</div>
+		<div class="uk-form-row uk-margin-top">
+			<label class="uk-form-label">故事会activity 1</label>
+			<textarea name="activity_1" cols="50" rows="10" value="{{ activity_1 }}" style="height: 245px; line-height: 150%;"></textarea>
+			<div class="uk-form-file">
+				<p>Select a picture for the activity 1</p>
+				<input name="activity_1_img" type="file">
+			</div>
+		</div>
+		<div class="uk-form-row uk-margin-top">
+			<label class="uk-form-label">故事会activity 2</label>
+			<textarea name="activity_2" cols="50" rows="10" value="{{ activity_2 }}" style="height: 245px; line-height: 150%;"></textarea>
+			<p>Select a picture for the activity 2</p>
+			<input name="activity_2_img" type="file">
+		</div>
+		<div class="uk-form-row uk-margin-top">
+			<label class="uk-form-label">故事会activity 3</label>
+			<textarea name="activity_3" cols="50" rows="10" value="{{ activity_3 }}" style="height: 245px; line-height: 150%;"></textarea>
+			<p>Select a picture for the activity 3</p>
+			<input name="activity_3_img" type="file">
+		</div>
+		<div class="uk-form-row uk-margin-top">
+			<label class="uk-form-label">故事会activity 4</label>
+			<textarea name="activity_4" cols="50" rows="10" value="{{ activity_4 }}" style="height: 245px; line-height: 150%;"></textarea>
+			<p>Select a picture for the activity 4</p>
+			<input name="activity_4_img" type="file">
+		</div>
+		<div class="uk-form-row uk-margin-top">
+			<label class="uk-form-label">故事会activity 5</label>
+			<textarea name="activity_5" cols="50" rows="10" value="{{ activity_5 }}" style="height: 245px; line-height: 150%;"></textarea>
+			<p>Select a picture for the activity 5</p>
+			<input name="activity_5_img" type="file">
+		</div>
+		<div class="uk-form-row uk-margin-top">
+			<label class="uk-form-label">故事会activity 6</label>
+			<textarea name="activity_6" cols="50" rows="10" value="{{ activity_6 }}" style="height: 245px; line-height: 150%;"></textarea>
+			<p>Select a picture for the activity 6</p>
+			<input name="activity_6_img" type="file">
+		</div>
 
+
+
+
+
+
+	
 		<div class="uk-form-row uk-text-center" style="padding-top: 100px">
 			<button name="previewnotice" class="uk-button uk-button-primary" style="width: 220px; height: 60px; font-size: 30px;">预览通知</button>
 		</div>

@@ -5,6 +5,7 @@ from django.template import Context
 from django.contrib.auth import authenticate, login, logout
 from django.views.decorators.csrf import csrf_protect
 from django.shortcuts import redirect
+from django.core.files.storage import FileSystemStorage
 import os.path
 from datetime import datetime
 import time
@@ -117,6 +118,35 @@ def createnotice(request):
 			current_notice['max_groupsize'] = request.POST['max_groupsize']
 			current_notice['registration_date'] = request.POST['registration_date']
 			current_notice['registration_time'] = request.POST['registration_time']
+			current_notice['activity_list'] = []	
+			for activity_no in range(6):
+				this_activity = {}
+				activity_name = 'activity_' + str(activity_no+1)
+				if request.POST[activity_name] != '':
+					this_activity['activity_name'] = 'Activity ' + str(activity_no+1)
+					this_activity['activity_info'] = request.POST[activity_name] 
+					this_activity['exist'] = True
+					try: 
+						activity_img_name = activity_name + '_img'
+						imgfile = request.FILES[activity_img_name]
+						filename = request.POST['gathering_date'] + '-' + activity_name
+						this_activity['activity_img_url'] = upload_activity_img(filename, imgfile)	
+						this_activity['activity_img_exist'] = True
+					except:
+						this_activity['activity_img_url'] = ''
+						this_activity['activity_img_exist'] = False
+	
+				else:
+					this_activity['activity_name'] = activity_name
+					this_activity['activity_info'] = request.POST[activity_name] 
+					this_activity['exist'] = False
+					this_activity['activity_img_url'] = ''
+					this_activity['activity_img_exist'] = False
+	
+
+				current_notice['activity_list'].append(this_activity)
+
+
 			errmsgs = checknotice(current_notice)
 			if len(errmsgs) == 0: 
 				context['isadmin'] = True
@@ -157,25 +187,43 @@ def createnotice(request):
 def shownotice(request):
 	context = {}
 	context['isadmin'] = False
-	current_notice = read_current_notice()
-	regData = readRegistrationData()
-	gathering_date = current_notice['gathering_date']
-	if gathering_date != '' and datetime.strptime(gathering_date, '%Y-%m-%d').date() >= datetime.today().date():
-		context['isactive'] = True
-		context['title'] = 'Brossard中文故事会 ' + gathering_date	
-		context['heading'] = '故事会通知 ' + gathering_date	
-		regDate = datetime.strptime(current_notice['registration_date'], '%Y-%m-%d').date()
-		regTime = datetime.strptime(current_notice['registration_time'], '%I:%M %p').time()
-		if checkRegistrationTime(regDate, regTime):
-			context['registration_allowed'] = True
-		else:
-			context['registration_allowed'] = False
-		context['registration_count'] = regData['count']
-		context['registration_list'] = regData['regList']
-		context.update(current_notice)
-		return render(request, 'notice.html', context)
+	
+	if 'brossard' in request.path:
+		district = 'Brossard'
+	elif 'longueuil' in request.path:
+		district = 'Longueuil'
+	elif 'montreal' in request.path:
+		district = 'Montreal'
 	else:
-		context['errmsg'] = 'There is no active notice' + gathering_date 
+		district = 'unspecified'
+
+	current_notice = read_current_notice(district)
+	regData = readRegistrationData(district)
+	if current_notice['published']:
+		gathering_date = current_notice['gathering_date']
+		if gathering_date != '' and datetime.strptime(gathering_date, '%Y-%m-%d').date() >= datetime.today().date():
+			context['isactive'] = True
+			context['title'] = district + '中文故事会 ' + gathering_date	
+			context['heading'] = district + '故事会通知 ' + gathering_date	
+			regDate = datetime.strptime(current_notice['registration_date'], '%Y-%m-%d').date()
+			regTime = datetime.strptime(current_notice['registration_time'], '%I:%M %p').time()
+			if checkRegistrationTime(regDate, regTime):
+				context['registration_allowed'] = True
+			else:
+				context['registration_allowed'] = False
+			context['registration_count'] = regData['count']
+			context['registration_list'] = regData['regList']
+			context['district_name'] = district
+			context.update(current_notice)
+			return render(request, 'notice.html', context)
+		else:
+			context['district_name'] = district
+			context['errmsg'] = 'There is no active notice' + gathering_date 
+			return render(request, 'notice.html', context)
+
+	else:
+		context['district_name'] = district
+		context['errmsg'] = 'There is no active notice'
 		return render(request, 'notice.html', context)
 
 def registration(request):
@@ -258,11 +306,16 @@ def checknotice(notice):
 
 	return errmsgs
 	
+def upload_activity_img(filename, imgfile):
+	fs = FileSystemStorage()
+	ext = os.path.splitext(imgfile.name)[1]
+	fname = fs.save(filename+ext, imgfile)
+	return fs.url(fname)
 
 def record_current_notice(notice):
 	current_notice = Current_Notice(
-		district = notice['district'],
 		published = notice['published'],
+		district = notice['district'],
 		gathering_date = notice['gathering_date'],
 		gathering_starttime = notice['gathering_starttime'],
 		gathering_endtime = notice['gathering_endtime'],
@@ -274,6 +327,36 @@ def record_current_notice(notice):
 		registration_date = notice['registration_date'],
 		registration_time = notice['registration_time'],
 		
+		activity_1_exist = notice['activity_list'][0]['exist'],
+		activity_1_info = notice['activity_list'][0]['activity_info'],
+		activity_1_img = notice['activity_list'][0]['activity_img_url'],
+		activity_1_img_exist = notice['activity_list'][0]['activity_img_exist'],
+
+		activity_2_exist = notice['activity_list'][1]['exist'],
+		activity_2_info = notice['activity_list'][1]['activity_info'],
+		activity_2_img = notice['activity_list'][1]['activity_img_url'],
+		activity_2_img_exist = notice['activity_list'][1]['activity_img_exist'],
+
+		activity_3_exist = notice['activity_list'][2]['exist'],
+		activity_3_info = notice['activity_list'][2]['activity_info'],
+		activity_3_img = notice['activity_list'][2]['activity_img_url'],
+		activity_3_img_exist = notice['activity_list'][2]['activity_img_exist'],
+
+		activity_4_exist = notice['activity_list'][3]['exist'],
+		activity_4_info = notice['activity_list'][3]['activity_info'],
+		activity_4_img = notice['activity_list'][3]['activity_img_url'],
+		activity_4_img_exist = notice['activity_list'][3]['activity_img_exist'],
+
+		activity_5_exist = notice['activity_list'][4]['exist'],
+		activity_5_info = notice['activity_list'][4]['activity_info'],
+		activity_5_img = notice['activity_list'][4]['activity_img_url'],
+		activity_5_img_exist = notice['activity_list'][4]['activity_img_exist'],
+
+		activity_6_exist = notice['activity_list'][5]['exist'],
+		activity_6_info = notice['activity_list'][5]['activity_info'],
+		activity_6_img = notice['activity_list'][5]['activity_img_url'],
+		activity_6_img_exist = notice['activity_list'][5]['activity_img_exist'],
+
 	)
 
 	current_notice.save()
@@ -285,6 +368,7 @@ def read_current_notice(district_name):
 	if count >= 1:
 		noticeDB = Current_Notice.objects.filter(district=district_name)[0]
 		current_notice['published'] = noticeDB.published
+		current_notice['district'] = noticeDB.district
 		current_notice['gathering_date'] = noticeDB.gathering_date
 		current_notice['gathering_starttime'] = noticeDB.gathering_starttime
 		current_notice['gathering_endtime'] = noticeDB.gathering_endtime
@@ -295,8 +379,71 @@ def read_current_notice(district_name):
 		current_notice['gathering_topic'] = noticeDB.gathering_topic
 		current_notice['registration_date'] = noticeDB.registration_date
 		current_notice['registration_time'] = noticeDB.registration_time
+		current_notice['activity_list'] = []
+		this_activity = {}
+		activity_id = 0
+		this_activity['exist'] = noticeDB.activity_1_exist
+		if this_activity['exist']:
+			activity_id = activity_id + 1
+			this_activity['activity_name'] = 'Activity ' + str(activity_id)
+			this_activity['activity_info'] = noticeDB.activity_1_info 
+			this_activity['activity_img_exist'] = noticeDB.activity_1_img_exist 
+			this_activity['activity_img_url'] = noticeDB.activity_1_img
+			current_notice['activity_list'].append(this_activity)
+
+		this_activity = {}
+		this_activity['exist'] = noticeDB.activity_2_exist
+		if this_activity['exist']:
+			activity_id = activity_id + 1
+			this_activity['activity_name'] = 'Activity ' + str(activity_id)
+			this_activity['activity_info'] = noticeDB.activity_2_info 
+			this_activity['activity_img_exist'] = noticeDB.activity_2_img_exist 
+			this_activity['activity_img_url'] = noticeDB.activity_2_img
+			current_notice['activity_list'].append(this_activity)
+
+		this_activity = {}
+		this_activity['exist'] = noticeDB.activity_3_exist
+		if this_activity['exist']:
+			activity_id = activity_id + 1
+			this_activity['activity_name'] = 'Activity ' + str(activity_id)
+			this_activity['activity_info'] = noticeDB.activity_3_info 
+			this_activity['activity_img_exist'] = noticeDB.activity_3_img_exist 
+			this_activity['activity_img_url'] = noticeDB.activity_3_img
+			current_notice['activity_list'].append(this_activity)
+
+		this_activity = {}
+		this_activity['exist'] = noticeDB.activity_4_exist
+		if this_activity['exist']:
+			activity_id = activity_id + 1
+			this_activity['activity_name'] = 'Activity ' + str(activity_id)
+			this_activity['activity_info'] = noticeDB.activity_4_info 
+			this_activity['activity_img_exist'] = noticeDB.activity_4_img_exist 
+			this_activity['activity_img_url'] = noticeDB.activity_4_img
+			current_notice['activity_list'].append(this_activity)
+
+		this_activity = {}
+		this_activity['exist'] = noticeDB.activity_5_exist
+		if this_activity['exist']:
+			activity_id = activity_id + 1
+			this_activity['activity_name'] = 'Activity ' + str(activity_id)
+			this_activity['activity_info'] = noticeDB.activity_5_info 
+			this_activity['activity_img_exist'] = noticeDB.activity_5_img_exist 
+			this_activity['activity_img_url'] = noticeDB.activity_5_img
+			current_notice['activity_list'].append(this_activity)
+
+		this_activity = {}
+		this_activity['exist'] = noticeDB.activity_6_exist
+		if this_activity['exist']:
+			activity_id = activity_id + 1
+			this_activity['activity_name'] = 'Activity ' + str(activity_id)
+			this_activity['activity_info'] = noticeDB.activity_6_info 
+			this_activity['activity_img_exist'] = noticeDB.activity_6_img_exist 
+			this_activity['activity_img_url'] = noticeDB.activity_6_img
+			current_notice['activity_list'].append(this_activity)
 		
 	else:
+		current_notice['published'] = False
+		current_notice['district'] = ''
 		current_notice['gathering_date'] = ''
 		current_notice['gathering_starttime'] = ''
 		current_notice['gathering_endtime'] = ''
@@ -305,7 +452,9 @@ def read_current_notice(district_name):
 		current_notice['gathering_topic'] = ''
 		current_notice['registration_date'] = ''
 		current_notice['registration_time'] = ''
-	
+		
+		current_notice['activity_list'] = []
+						
 	return current_notice
 	
 	
@@ -323,6 +472,24 @@ def setdefaultnotice():
 	default_notice['gathering_address'] = '7855 Ave San Francisco, Brossard J4X 2A4'
 	default_notice['registration_date'] = ''
 	default_notice['registration_time'] = ''
+	default_notice['activity_1'] = ''
+	default_notice['activity_1_img'] = ''
+	default_notice['activity_1_img_exist'] = False
+	default_notice['activity_2'] = ''
+	default_notice['activity_2_img'] = ''
+	default_notice['activity_2_img_exist'] = False
+	default_notice['activity_3'] = ''
+	default_notice['activity_3_img'] = ''
+	default_notice['activity_3_img_exist'] = False
+	default_notice['activity_4'] = ''
+	default_notice['activity_4_img'] = ''
+	default_notice['activity_4_img_exist'] = False
+	default_notice['activity_5'] = ''
+	default_notice['activity_5_img'] = ''
+	default_notice['activity_5_img_exist'] = False
+	default_notice['activity_6'] = ''
+	default_notice['activity_6_img'] = ''
+	default_notice['activity_6_img_exist'] = False
 	
 	return default_notice
 	

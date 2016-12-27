@@ -22,7 +22,7 @@ from chinesestory import views
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
 	url(r'^$', views.adminlogin),
-	url(r'^chinesestory/', views.index),
+	url(r'^chinesestory$', views.index),
 	url(r'^chinesestory/admin/', views.adminlogin),
 	url(r'^chinesestory/logout/', views.adminlogout),
 	url(r'^chinesestory/brossard/', views.shownotice),
