@@ -123,7 +123,7 @@ def createnotice(request):
 				this_activity = {}
 				activity_name = 'activity_' + str(activity_no+1)
 				if request.POST[activity_name] != '':
-					this_activity['activity_name'] = 'Activity ' + str(activity_no+1)
+					this_activity['activity_name'] = '活动内容 ' + str(activity_no+1)
 					this_activity['activity_info'] = request.POST[activity_name] 
 					this_activity['exist'] = True
 					try: 
