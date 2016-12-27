@@ -472,6 +472,7 @@ def setdefaultnotice():
 	default_notice['gathering_address'] = '7855 Ave San Francisco, Brossard J4X 2A4'
 	default_notice['registration_date'] = ''
 	default_notice['registration_time'] = ''
+			
 	default_notice['activity_1'] = ''
 	default_notice['activity_1_img'] = ''
 	default_notice['activity_1_img_exist'] = False
