@@ -474,7 +474,11 @@ def setdefaultnotice():
 	default_notice['registration_time'] = ''
 			
 	default_notice['activity_2'] = 'story book'
-	default_notice['activity_1'] = 'Twinkle Twinkle Little Stari &#013; &#010; how I wonder what you are'
+	default_notice['activity_1'] = '小朋友们自我介绍，然后一起唱故事会开场歌曲《你好歌》\
+	曲调：Twinkle Twinkle Little Star \
+	词：冯丽丽，汪开娴\ 
+	你好，你好，大家好，欢迎你们来这里。\
+	唱歌，读书，交朋友，聚在一起多有趣。\你好，你好，大家好，我很高兴认识你！' 
 	default_notice['activity_1_img'] = ''
 	default_notice['activity_1_img_exist'] = False
 	default_notice['activity_2_img'] = ''
