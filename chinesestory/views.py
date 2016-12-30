@@ -273,7 +273,7 @@ def registration(request):
 			return render(request, 'error.html', context)
 	else:
 		
-		context['heading'] = gatheringDate + ' Chinese Story registration'
+		context['heading'] = gatheringDate + ' 故事会报名'
 		return render(request, 'registration.html', context)
 	
 def checknotice(notice):
