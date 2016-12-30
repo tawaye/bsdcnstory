@@ -241,6 +241,8 @@ def registration(request):
 	else:
 		district = 'unspecified'
 
+	context['district_name'] = district
+
 	current_notice = read_current_notice(district)
 	gatheringDate = current_notice['gathering_date']
 	regDate = datetime.strptime(current_notice['registration_date'], '%Y-%m-%d').date()	
@@ -270,7 +272,8 @@ def registration(request):
 			context['errmsg'] = errmsgs
 			return render(request, 'error.html', context)
 	else:
-		context['heading'] = district + ' Chinese Story registration'
+		
+		context['heading'] = gatheringDate + ' Chinese Story registration'
 		return render(request, 'registration.html', context)
 	
 def checknotice(notice):
