@@ -164,10 +164,12 @@ def createnotice(request):
 			record_current_notice(current_notice)
 			current_registration = readRegistrationData(district)
 			gathering_date = current_notice['gathering_date']
-			notice_file = notice_file_path + district + '-' + gathering_date + '.json'
-			pFile = open(notice_file, 'w')
-			pFile.write(json.dumps(current_notice))
-			pFile.write(json.dumps(current_registration))
+			json_file = notice_file_path + district + '-' + gathering_date + '.json'
+			pFile = open(json_file, 'w')
+			json_data = {}
+			json_data['notice_data'] = current_notice
+			json_data['registration_data'] = current_registration
+			pFile.write(json.dumps(json_data))
 			clearRegistrationData(district)
 			pFile.close()
 			return render(request, 'succeed.html', {})
@@ -230,7 +232,17 @@ def registration(request):
 	context = {}
 	errmsgs = []
 	regData = {}
-	current_notice = read_current_notice()
+	if 'brossard' in request.path:
+		district = 'Brossard'
+	elif 'longueuil' in request.path:
+		district = 'Longueuil'
+	elif 'montreal' in request.path:
+		district = 'Montreal'
+	else:
+		district = 'unspecified'
+
+	current_notice = read_current_notice(district)
+	gatheringDate = current_notice['gathering_date']
 	regDate = datetime.strptime(current_notice['registration_date'], '%Y-%m-%d').date()	
 	regTime = datetime.strptime(current_notice['registration_time'], '%I:%M %p').time()	
 	if not checkRegistrationTime(regDate, regTime):
@@ -243,10 +255,11 @@ def registration(request):
 		regData['child_name_1'] = request.POST['child_name_1']	
 		regData['child_name_2'] = request.POST['child_name_2']	
 		regData['child_name_3'] = request.POST['child_name_3']	
-		if checkRegistrationLimit():
-			if checkRegistrationDuplicate(regData['parent_name']):
-				saveRegistrationData(regData)
-				context['successMsg'] = 'Your registration is accepted.'
+		if checkRegistrationLimit(district):
+			if checkRegistrationDuplicate(district, regData['parent_name']):
+				saveRegistrationData(district, gatheringDate, regData)
+				update_json_file(district, gatheringDate)	
+				context['successMsg'] = 'Your registration is accepted.' + district
 				return render(request, 'succeed.html', context)
 			else:
 				errmsgs.append('The name ' + regData['parent_name'] + 'has already been registered.')	
@@ -257,7 +270,7 @@ def registration(request):
 			context['errmsg'] = errmsgs
 			return render(request, 'error.html', context)
 	else:
-		context['heading'] = 'Brossard Chinese Story registration'
+		context['heading'] = district + ' Chinese Story registration'
 		return render(request, 'registration.html', context)
 	
 def checknotice(notice):
@@ -362,11 +375,11 @@ def record_current_notice(notice):
 	current_notice.save()
 	
 	
-def read_current_notice(district_name):
+def read_current_notice(districtName):
 	current_notice = {}
-	count = Current_Notice.objects.filter(district=district_name).count()
+	count = Current_Notice.objects.filter(district=districtName).count()
 	if count >= 1:
-		noticeDB = Current_Notice.objects.filter(district=district_name)[0]
+		noticeDB = Current_Notice.objects.filter(district=districtName)[0]
 		current_notice['published'] = noticeDB.published
 		current_notice['district'] = noticeDB.district
 		current_notice['gathering_date'] = noticeDB.gathering_date
@@ -381,65 +394,58 @@ def read_current_notice(district_name):
 		current_notice['registration_time'] = noticeDB.registration_time
 		current_notice['activity_list'] = []
 		this_activity = {}
-		activity_id = 0
+		activity_id = 1
 		this_activity['exist'] = noticeDB.activity_1_exist
-		if this_activity['exist']:
-			activity_id = activity_id + 1
-			this_activity['activity_name'] = 'Activity ' + str(activity_id)
-			this_activity['activity_info'] = noticeDB.activity_1_info 
-			this_activity['activity_img_exist'] = noticeDB.activity_1_img_exist 
-			this_activity['activity_img_url'] = noticeDB.activity_1_img
-			current_notice['activity_list'].append(this_activity)
+		this_activity['activity_name'] = 'Activity ' + str(activity_id)
+		this_activity['activity_info'] = noticeDB.activity_1_info 
+		this_activity['activity_img_exist'] = noticeDB.activity_1_img_exist 
+		this_activity['activity_img_url'] = noticeDB.activity_1_img
+		current_notice['activity_list'].append(this_activity)
 
+		activity_id = activity_id + 1
 		this_activity = {}
 		this_activity['exist'] = noticeDB.activity_2_exist
-		if this_activity['exist']:
-			activity_id = activity_id + 1
-			this_activity['activity_name'] = 'Activity ' + str(activity_id)
-			this_activity['activity_info'] = noticeDB.activity_2_info 
-			this_activity['activity_img_exist'] = noticeDB.activity_2_img_exist 
-			this_activity['activity_img_url'] = noticeDB.activity_2_img
-			current_notice['activity_list'].append(this_activity)
+		this_activity['activity_name'] = 'Activity ' + str(activity_id)
+		this_activity['activity_info'] = noticeDB.activity_2_info 
+		this_activity['activity_img_exist'] = noticeDB.activity_2_img_exist 
+		this_activity['activity_img_url'] = noticeDB.activity_2_img
+		current_notice['activity_list'].append(this_activity)
 
+		activity_id = activity_id + 1
 		this_activity = {}
 		this_activity['exist'] = noticeDB.activity_3_exist
-		if this_activity['exist']:
-			activity_id = activity_id + 1
-			this_activity['activity_name'] = 'Activity ' + str(activity_id)
-			this_activity['activity_info'] = noticeDB.activity_3_info 
-			this_activity['activity_img_exist'] = noticeDB.activity_3_img_exist 
-			this_activity['activity_img_url'] = noticeDB.activity_3_img
-			current_notice['activity_list'].append(this_activity)
+		this_activity['activity_name'] = 'Activity ' + str(activity_id)
+		this_activity['activity_info'] = noticeDB.activity_3_info 
+		this_activity['activity_img_exist'] = noticeDB.activity_3_img_exist 
+		this_activity['activity_img_url'] = noticeDB.activity_3_img
+		current_notice['activity_list'].append(this_activity)
 
+		activity_id = activity_id + 1
 		this_activity = {}
 		this_activity['exist'] = noticeDB.activity_4_exist
-		if this_activity['exist']:
-			activity_id = activity_id + 1
-			this_activity['activity_name'] = 'Activity ' + str(activity_id)
-			this_activity['activity_info'] = noticeDB.activity_4_info 
-			this_activity['activity_img_exist'] = noticeDB.activity_4_img_exist 
-			this_activity['activity_img_url'] = noticeDB.activity_4_img
-			current_notice['activity_list'].append(this_activity)
+		this_activity['activity_name'] = 'Activity ' + str(activity_id)
+		this_activity['activity_info'] = noticeDB.activity_4_info 
+		this_activity['activity_img_exist'] = noticeDB.activity_4_img_exist 
+		this_activity['activity_img_url'] = noticeDB.activity_4_img
+		current_notice['activity_list'].append(this_activity)
 
+		activity_id = activity_id + 1
 		this_activity = {}
 		this_activity['exist'] = noticeDB.activity_5_exist
-		if this_activity['exist']:
-			activity_id = activity_id + 1
-			this_activity['activity_name'] = 'Activity ' + str(activity_id)
-			this_activity['activity_info'] = noticeDB.activity_5_info 
-			this_activity['activity_img_exist'] = noticeDB.activity_5_img_exist 
-			this_activity['activity_img_url'] = noticeDB.activity_5_img
-			current_notice['activity_list'].append(this_activity)
+		this_activity['activity_name'] = 'Activity ' + str(activity_id)
+		this_activity['activity_info'] = noticeDB.activity_5_info 
+		this_activity['activity_img_exist'] = noticeDB.activity_5_img_exist 
+		this_activity['activity_img_url'] = noticeDB.activity_5_img
+		current_notice['activity_list'].append(this_activity)
 
 		this_activity = {}
+		activity_id = activity_id + 1
 		this_activity['exist'] = noticeDB.activity_6_exist
-		if this_activity['exist']:
-			activity_id = activity_id + 1
-			this_activity['activity_name'] = 'Activity ' + str(activity_id)
-			this_activity['activity_info'] = noticeDB.activity_6_info 
-			this_activity['activity_img_exist'] = noticeDB.activity_6_img_exist 
-			this_activity['activity_img_url'] = noticeDB.activity_6_img
-			current_notice['activity_list'].append(this_activity)
+		this_activity['activity_name'] = 'Activity ' + str(activity_id)
+		this_activity['activity_info'] = noticeDB.activity_6_info 
+		this_activity['activity_img_exist'] = noticeDB.activity_6_img_exist 
+		this_activity['activity_img_url'] = noticeDB.activity_6_img
+		current_notice['activity_list'].append(this_activity)
 		
 	else:
 		current_notice['published'] = False
@@ -474,11 +480,11 @@ def setdefaultnotice():
 	default_notice['registration_time'] = ''
 			
 	default_notice['activity_2'] = 'story book'
-	default_notice['activity_1'] = '小朋友们自我介绍，然后一起唱故事会开场歌曲《你好歌》\
-	曲调：Twinkle Twinkle Little Star \
-	词：冯丽丽，汪开娴\ 
-	你好，你好，大家好，欢迎你们来这里。\
-	唱歌，读书，交朋友，聚在一起多有趣。\你好，你好，大家好，我很高兴认识你！' 
+	default_notice['activity_1'] = '小朋友们自我介绍，然后一起唱故事会开场歌曲《你好歌》'\
+'(曲调：Twinkle Twinkle Little Star '\
+'词：冯丽丽 汪开娴) '\
+'你好，你好，大家好，欢迎你们来这里。'\
+'唱歌，读书，交朋友，聚在一起多有趣。你好，你好，大家好，我很高兴认识你！' 
 	default_notice['activity_1_img'] = ''
 	default_notice['activity_1_img_exist'] = False
 	default_notice['activity_2_img'] = ''
@@ -507,23 +513,25 @@ def checkRegistrationTime(regDate, regTime):
 	else:
 		return False
 
-def checkRegistrationLimit():
-	noticeData = read_current_notice()
+def checkRegistrationLimit(districtName):
+	noticeData = read_current_notice(districtName)
 	regLimit = noticeData['max_groupsize']
-	regCount = Current_Registration.objects.all().count()
+	regCount = Current_Registration.objects.filter(district=districtName).count()
 	if regCount >= regLimit:
 		return False
 	else:
 		return True
 
-def checkRegistrationDuplicate(name):
-	if Current_Registration.objects.filter(parent_name=name).count() > 0:
+def checkRegistrationDuplicate(districtName, parentName):
+	if Current_Registration.objects.filter(district=districtName, parent_name=parentName).count() > 0:
 		return False
 	else:
 		return True
 	
-def saveRegistrationData(regData):
+def saveRegistrationData(districtName, gatheringDate, regData):
 	new_registration = Current_Registration(
+		district = districtName,
+		gathering_date = gatheringDate,	
 		parent_name = regData['parent_name'],
 		num_of_children = int(regData['num_of_children']),
 		child_name_1 = regData['child_name_1'],
@@ -533,10 +541,10 @@ def saveRegistrationData(regData):
 	new_registration.save()
 	return	
 
-def readRegistrationData(district_name):
+def readRegistrationData(districtName):
 	regData = {}
 	regList = []
-	regDB = Current_Registration.objects.filter(district=district_name)
+	regDB = Current_Registration.objects.filter(district=districtName)
 	regCount = regDB.count()
 	if regCount >=1:
 		ii = 0
@@ -560,10 +568,22 @@ def readRegistrationData(district_name):
 	regData['regList'] = regList	
 	return regData
 
-def clearRegistrationData(district_name):
-	regDB = Current_Registration.objects.filter(district=district_name)
+def clearRegistrationData(districtName):
+	regDB = Current_Registration.objects.filter(district=districtName)
 	regDB.delete()
 	return
 
+	
+def update_json_file(district, gathering_date):
+	json_file = notice_file_path + district + '-' + gathering_date + '.json'
+	pFile = open(json_file, 'r')
+	json_data = json.load(pFile)
+	pFile.close()
+
+	json_data['registration_data'] = readRegistrationData(district)
+	pFile = open(json_file, 'w+')
+	pFile.write(json.dumps(json_data))
+	pFile.close()
+	
 	
 	

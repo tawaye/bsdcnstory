@@ -15,7 +15,7 @@
 		{% for this_activity in activity_list %}
 			{% if this_activity.exist %}
 				<p style="font-size: 30px; line-height: 120%;">{{ this_activity.activity_name }}</p>
-				<p style="font-size: 24px; line-height: 80%;"> {{ this_activity.activity_info }}</p>
+				<p style="font-size: 24px; line-height: 120%;"> {{ this_activity.activity_info }}</p>
 				{% if this_activity.activity_img_exist %}
 					<img src="{{ this_activity.activity_img_url }}"></img>
 				{% endif %}
@@ -32,7 +32,7 @@
 		</ul>
 		<div class="uk-panel uk-text-center" style="padding-top: 100px">
 			{% if registration_allowed %}
-			<button class="uk-button uk-button-large uk-button-primary" style="font-size: 26px"><a href="/chinesestory/registration">我要报名</a></button>
+			<button class="uk-button uk-button-large uk-button-primary" style="font-size: 26px"><a href="./registration">我要报名</a></button>
 			{% else %}
 			<p>Too early. Please come back and refresh the page after {{ registration_date }}, {{registration_time }}</p>
 			<button class="uk-button uk-button-large" style="width: 180px; height: 60px; font-size: 30px">我要报名</button>
