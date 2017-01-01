@@ -240,6 +240,7 @@ def shownotice(request):
 			else:
 				context['registration_allowed'] = False
 			context['registration_count'] = getChildCount(regData)
+			context['limit_reached'] = not checkRegistrationLimit(district)
 			context['registration_list'] = regData['regList']
 			context['district_name'] = district
 			context.update(current_notice)

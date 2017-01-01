@@ -24,7 +24,9 @@
 		
 
 
-		<p style="font-size: 30px; line-height: 120%">当前已有 {{ registration_count }} 名儿童报名。</p>
+		<p style="font-size: 30px; line-height: 120%">当前已有 {{ registration_count }} 名儿童报名。
+			{% if limit_reached %} Registration is over {% endif %}
+		</p>
 		<ul class="uk-list" style="font-size: 20px; line-height: 120%;">
 		{% for reg in registration_list %}
 			<li style="padding-left: 60px;"> {{ reg.parent_name }} ( {{ reg.num_of_children }} )</li>
