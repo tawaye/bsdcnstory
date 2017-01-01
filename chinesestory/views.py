@@ -84,12 +84,11 @@ def viewregistration(request):
 		context['username'] = username
 		district = district_name[username] 
 		context['district_name'] = district
-		context['heading'] = 'View registrations' 
-
 
 		if request.GET:
 			context['viewhistory'] = True
 			context['viewcurrent'] = False
+			context['heading'] = '管理员功能 - 查看过去故事会信息'
 			history_time = request.GET['history_time']
 			context['gathering_date'] = history_time
 			context['history_notice'] = getHistoryNotice(history_time)
@@ -99,8 +98,10 @@ def viewregistration(request):
 			context['history_list'] = getHistoryList(district)
 			
 		else:
+			
 			context['viewhistory'] = False
 			context['viewcurrent'] = True
+			context['heading'] = '管理员功能 - 查看当前报名情况'
 			current_notice = read_current_notice(district)
 			current_regdata = readRegistrationData(district)
 			context['gathering_date'] = current_notice['gathering_date']
@@ -110,7 +111,7 @@ def viewregistration(request):
 			if len(history_list) >= 1:
 				context['history_list'] = history_list[1:]
 			else:
-				context['history_list'] = ['There is no history data.']
+				context['history_list'] = ['无过去故事会信息。']
 		return render(request, 'viewregistration.html', context)
 	else:
 		return render(request, 'notloggedin.html')
