@@ -1,14 +1,50 @@
 {% extends "./base.html" %}
 {% block content %}
 
-	<div class="uk-panel uk-panel-box uk-container-center uk-text-left" style="width: 480px">
+	<div class="uk-panel uk-panel-box uk-container-center uk-text-left" style="width: 700px">
 	{% if authenticated %}
-		<h2>Current Registration ( {{ gathering_date }}):</h2>
-		<h3>There are in total {{ registration_count }} registrations.</h3>		
-		<ur class="uk-list" style="font-size: 26px; line-height: 38px;">
+		{% if viewcurrent %}
+		<p style="font-size: 30px">Current Registration ( {{ gathering_date }}):</p>
+		<p style="font-size: 26px">There are in total {{ registration_count }} registrations.</p>		
+		<ul class="uk-list" style="font-size: 26px; line-height: 38px;">
 			{% for reg in registration_list %}
 				<li>{{ reg.parent_name }} ( {{ reg.num_of_children }} ): {{ reg.child_name_1 }}, {{ reg.child_name_2 }}, {{ reg.child_name_3 }} </li>
 			{% endfor %}
+		</ul>
+		{% endif %}
+
+		{% if viewhistory %}
+		<p style="font-size: 30px">History Registration ( {{ gathering_date }})</p>
+		<table class="uk-table" style="font-size: 20px">
+			<tr><td>Topic</td><td>{{ history_notice.gathering_topic }}</td></tr>
+			<tr><td>Moderator</td><td>{{ history_notice.gathering_moderator }}</td></tr>
+			<tr><td>Place</td><td>{{ history_notice.gathering_place }}</td></tr>
+			<tr><td>Time</td><td>{{ history_notice.gathering_starttime }} -- {{ history_notice.gathering_endtime }}</td></tr>
+			<tr><td>Group Size</td><td>{{ history_notice.max_groupsize }}</td></tr>
+			{% for activity in history_notice.activity_list %}
+				<tr><td>{{activity.activity_name}}</td><td>{{ activity.activity_info}}</td></tr>
+			{% endfor %}	
+			
+		</table>
+
+		<hr>
+		<p style="font-size: 26px">There are in total {{ registration_count }} registrations.</p>		
+		<ul class="uk-list" style="font-size: 26px; line-height: 38px;">
+			{% for reg in registration_list %}
+				<li>{{ reg.parent_name }} ( {{ reg.num_of_children }} ): {{ reg.child_name_1 }}, {{ reg.child_name_2 }}, {{ reg.child_name_3 }} </li>
+			{% endfor %}
+		</ul>
+		{% endif %}
+
+
+		<form class="uk-form uk-form-stacked" method="get">
+		{% for history_file in history_list %}	
+			<div class="uk-form-row">
+				<button name="history_time" value={{ history_file }} type="submit" style="font-size: 26px; background: transparent; border: 0px; color: blue; cursor: pointer;">{{ history_file }}</button>
+			</div>
+		{% endfor %}
+		</form>
+	
 	{% else %}
 		{{ errmsg }}
 	{% endif %}

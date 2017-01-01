@@ -67,7 +67,7 @@ def adminlogin(request):
 				return render(request, 'adminlogin.html', context)
 	else:
 		context['authenticated'] = False
-		context['title'] = 'Brossard中文故事会-管理员登录'
+		context['title'] = '中文故事会-管理员登录'
 		context['heading'] = '管理员登录'
 		return render(request, 'adminlogin.html', context)
 
@@ -83,18 +83,41 @@ def viewregistration(request):
 		username = request.user.username
 		context['username'] = username
 		district = district_name[username] 
-		notice = read_current_notice(district)
-		regData = readRegistrationData(district)
-		context['gathering_date'] = notice['gathering_date']
-		context['registration_count'] = regData['count']	
-		context['registration_list'] = regData['regList']	
-		
+		context['district_name'] = district
+		context['heading'] = 'View registrations' 
+
+
+		if request.GET:
+			context['viewhistory'] = True
+			context['viewcurrent'] = False
+			history_time = request.GET['history_time']
+			context['gathering_date'] = history_time
+			context['history_notice'] = getHistoryNotice(history_time)
+			history_regdata = getHistoryRegData(history_time)
+			context['registration_count'] = getChildCount(history_regdata)			
+			context['registration_list'] = history_regdata['regList']
+			context['history_list'] = getHistoryList(district)
+			
+		else:
+			context['viewhistory'] = False
+			context['viewcurrent'] = True
+			current_notice = read_current_notice(district)
+			current_regdata = readRegistrationData(district)
+			context['gathering_date'] = current_notice['gathering_date']
+			context['registration_count'] = getChildCount(current_regdata)
+			context['registration_list'] = current_regdata['regList']	
+			history_list = getHistoryList(district)
+			if len(history_list) >= 1:
+				context['history_list'] = history_list[1:]
+			else:
+				context['history_list'] = ['There is no history data.']
 		return render(request, 'viewregistration.html', context)
 	else:
 		return render(request, 'notloggedin.html')
 		
 def createnotice(request):
 	current_notice = {}
+	temp_notice = {}
 	context = {}
 	if not request.user.is_authenticated:
 		return render(request, 'notloggedin.html')
@@ -106,19 +129,19 @@ def createnotice(request):
 		if 'previewnotice' in request.POST:
 			context['isadmin'] = True
 			context['isactive'] = True	
-			current_notice['published'] = False
-			current_notice['district'] = district
-			current_notice['gathering_date'] = request.POST['gathering_date']
-			current_notice['gathering_starttime'] = request.POST['gathering_starttime']
-			current_notice['gathering_endtime'] = request.POST['gathering_endtime']
-			current_notice['gathering_place'] = request.POST['gathering_place']
-			current_notice['gathering_address'] = request.POST['gathering_address']
-			current_notice['gathering_moderator'] = request.POST['gathering_moderator']
-			current_notice['gathering_topic'] = request.POST['gathering_topic']
-			current_notice['max_groupsize'] = request.POST['max_groupsize']
-			current_notice['registration_date'] = request.POST['registration_date']
-			current_notice['registration_time'] = request.POST['registration_time']
-			current_notice['activity_list'] = []	
+			temp_notice['published'] = False
+			temp_notice['district'] = district
+			temp_notice['gathering_date'] = request.POST['gathering_date']
+			temp_notice['gathering_starttime'] = request.POST['gathering_starttime']
+			temp_notice['gathering_endtime'] = request.POST['gathering_endtime']
+			temp_notice['gathering_place'] = request.POST['gathering_place']
+			temp_notice['gathering_address'] = request.POST['gathering_address']
+			temp_notice['gathering_moderator'] = request.POST['gathering_moderator']
+			temp_notice['gathering_topic'] = request.POST['gathering_topic']
+			temp_notice['max_groupsize'] = request.POST['max_groupsize']
+			temp_notice['registration_date'] = request.POST['registration_date']
+			temp_notice['registration_time'] = request.POST['registration_time']
+			temp_notice['activity_list'] = []	
 			for activity_no in range(6):
 				this_activity = {}
 				activity_name = 'activity_' + str(activity_no+1)
@@ -144,22 +167,22 @@ def createnotice(request):
 					this_activity['activity_img_exist'] = False
 	
 
-				current_notice['activity_list'].append(this_activity)
+				temp_notice['activity_list'].append(this_activity)
 
 
-			errmsgs = checknotice(current_notice)
+			errmsgs = checknotice(temp_notice)
 			if len(errmsgs) == 0: 
 				context['isadmin'] = True
 				context['isactive'] = True
 				context['heading'] = '管理员功能 - 预览通知'
-				context.update(current_notice)
-				record_current_notice(current_notice)
+				context.update(temp_notice)
+				record_temp_notice(temp_notice)
 				return render(request, 'notice.html', context)
 			else:
 				context['errmsg'] = errmsgs
 				return render(request, 'error.html', context)
 		elif 'publishnotice' in request.POST:
-			current_notice = read_current_notice(district)
+			current_notice = read_temp_notice(district)
 			current_notice['published'] = True
 			record_current_notice(current_notice)
 			current_registration = readRegistrationData(district)
@@ -174,8 +197,10 @@ def createnotice(request):
 			pFile.close()
 			return render(request, 'succeed.html', {})
 		elif 'modifynotice' in request.POST:
-			current_notice = read_current_notice(district)
-			return render(request, 'createnotice.html', current_notice) 
+			temp_notice = read_temp_notice(district)
+			context['heading'] = '管理员功能 - 创建新故事会通知'
+			context.update(temp_notice)
+			return render(request, 'createnotice.html', context) 
 		else:
 			return render(request, 'error.html', {})
 	else:
@@ -213,7 +238,7 @@ def shownotice(request):
 				context['registration_allowed'] = True
 			else:
 				context['registration_allowed'] = False
-			context['registration_count'] = regData['count']
+			context['registration_count'] = getChildCount(regData)
 			context['registration_list'] = regData['regList']
 			context['district_name'] = district
 			context.update(current_notice)
@@ -328,6 +353,55 @@ def upload_activity_img(filename, imgfile):
 	fname = fs.save(filename+ext, imgfile)
 	return fs.url(fname)
 
+def record_temp_notice(notice):
+	temp_notice = Temp_Notice(
+		published = notice['published'],
+		district = notice['district'],
+		gathering_date = notice['gathering_date'],
+		gathering_starttime = notice['gathering_starttime'],
+		gathering_endtime = notice['gathering_endtime'],
+		gathering_place = notice['gathering_place'],
+		gathering_address = notice['gathering_address'],
+		max_groupsize = int(notice['max_groupsize']),
+		gathering_moderator = notice['gathering_moderator'],
+		gathering_topic = notice['gathering_topic'],
+		registration_date = notice['registration_date'],
+		registration_time = notice['registration_time'],
+		
+		activity_1_exist = notice['activity_list'][0]['exist'],
+		activity_1_info = notice['activity_list'][0]['activity_info'],
+		activity_1_img = notice['activity_list'][0]['activity_img_url'],
+		activity_1_img_exist = notice['activity_list'][0]['activity_img_exist'],
+
+		activity_2_exist = notice['activity_list'][1]['exist'],
+		activity_2_info = notice['activity_list'][1]['activity_info'],
+		activity_2_img = notice['activity_list'][1]['activity_img_url'],
+		activity_2_img_exist = notice['activity_list'][1]['activity_img_exist'],
+
+		activity_3_exist = notice['activity_list'][2]['exist'],
+		activity_3_info = notice['activity_list'][2]['activity_info'],
+		activity_3_img = notice['activity_list'][2]['activity_img_url'],
+		activity_3_img_exist = notice['activity_list'][2]['activity_img_exist'],
+
+		activity_4_exist = notice['activity_list'][3]['exist'],
+		activity_4_info = notice['activity_list'][3]['activity_info'],
+		activity_4_img = notice['activity_list'][3]['activity_img_url'],
+		activity_4_img_exist = notice['activity_list'][3]['activity_img_exist'],
+
+		activity_5_exist = notice['activity_list'][4]['exist'],
+		activity_5_info = notice['activity_list'][4]['activity_info'],
+		activity_5_img = notice['activity_list'][4]['activity_img_url'],
+		activity_5_img_exist = notice['activity_list'][4]['activity_img_exist'],
+
+		activity_6_exist = notice['activity_list'][5]['exist'],
+		activity_6_info = notice['activity_list'][5]['activity_info'],
+		activity_6_img = notice['activity_list'][5]['activity_img_url'],
+		activity_6_img_exist = notice['activity_list'][5]['activity_img_exist'],
+
+	)
+	temp_notice.save()
+
+
 def record_current_notice(notice):
 	current_notice = Current_Notice(
 		published = notice['published'],
@@ -377,6 +451,94 @@ def record_current_notice(notice):
 
 	current_notice.save()
 	
+	
+def read_temp_notice(districtName):
+	temp_notice = {}
+	count = Temp_Notice.objects.filter(district=districtName).count()
+	if count >= 1:
+		noticeDB = Temp_Notice.objects.filter(district=districtName)[0]
+		temp_notice['published'] = noticeDB.published
+		temp_notice['district'] = noticeDB.district
+		temp_notice['gathering_date'] = noticeDB.gathering_date
+		temp_notice['gathering_starttime'] = noticeDB.gathering_starttime
+		temp_notice['gathering_endtime'] = noticeDB.gathering_endtime
+		temp_notice['gathering_place'] = noticeDB.gathering_place
+		temp_notice['gathering_address'] = noticeDB.gathering_address
+		temp_notice['max_groupsize'] = noticeDB.max_groupsize
+		temp_notice['gathering_moderator'] = noticeDB.gathering_moderator
+		temp_notice['gathering_topic'] = noticeDB.gathering_topic
+		temp_notice['registration_date'] = noticeDB.registration_date
+		temp_notice['registration_time'] = noticeDB.registration_time
+		temp_notice['activity_list'] = []
+		this_activity = {}
+		activity_id = 1
+		this_activity['exist'] = noticeDB.activity_1_exist
+		this_activity['activity_name'] = 'Activity ' + str(activity_id)
+		this_activity['activity_info'] = noticeDB.activity_1_info 
+		this_activity['activity_img_exist'] = noticeDB.activity_1_img_exist 
+		this_activity['activity_img_url'] = noticeDB.activity_1_img
+		temp_notice['activity_list'].append(this_activity)
+
+		activity_id = activity_id + 1
+		this_activity = {}
+		this_activity['exist'] = noticeDB.activity_2_exist
+		this_activity['activity_name'] = 'Activity ' + str(activity_id)
+		this_activity['activity_info'] = noticeDB.activity_2_info 
+		this_activity['activity_img_exist'] = noticeDB.activity_2_img_exist 
+		this_activity['activity_img_url'] = noticeDB.activity_2_img
+		temp_notice['activity_list'].append(this_activity)
+
+		activity_id = activity_id + 1
+		this_activity = {}
+		this_activity['exist'] = noticeDB.activity_3_exist
+		this_activity['activity_name'] = 'Activity ' + str(activity_id)
+		this_activity['activity_info'] = noticeDB.activity_3_info 
+		this_activity['activity_img_exist'] = noticeDB.activity_3_img_exist 
+		this_activity['activity_img_url'] = noticeDB.activity_3_img
+		temp_notice['activity_list'].append(this_activity)
+
+		activity_id = activity_id + 1
+		this_activity = {}
+		this_activity['exist'] = noticeDB.activity_4_exist
+		this_activity['activity_name'] = 'Activity ' + str(activity_id)
+		this_activity['activity_info'] = noticeDB.activity_4_info 
+		this_activity['activity_img_exist'] = noticeDB.activity_4_img_exist 
+		this_activity['activity_img_url'] = noticeDB.activity_4_img
+		temp_notice['activity_list'].append(this_activity)
+
+		activity_id = activity_id + 1
+		this_activity = {}
+		this_activity['exist'] = noticeDB.activity_5_exist
+		this_activity['activity_name'] = 'Activity ' + str(activity_id)
+		this_activity['activity_info'] = noticeDB.activity_5_info 
+		this_activity['activity_img_exist'] = noticeDB.activity_5_img_exist 
+		this_activity['activity_img_url'] = noticeDB.activity_5_img
+		temp_notice['activity_list'].append(this_activity)
+
+		this_activity = {}
+		activity_id = activity_id + 1
+		this_activity['exist'] = noticeDB.activity_6_exist
+		this_activity['activity_name'] = 'Activity ' + str(activity_id)
+		this_activity['activity_info'] = noticeDB.activity_6_info 
+		this_activity['activity_img_exist'] = noticeDB.activity_6_img_exist 
+		this_activity['activity_img_url'] = noticeDB.activity_6_img
+		temp_notice['activity_list'].append(this_activity)
+		
+	else:
+		temp_notice['published'] = False
+		temp_notice['district'] = ''
+		temp_notice['gathering_date'] = ''
+		temp_notice['gathering_starttime'] = ''
+		temp_notice['gathering_endtime'] = ''
+		temp_notice['gathering_place'] = ''
+		temp_notice['gathering_moderator'] = ''
+		temp_notice['gathering_topic'] = ''
+		temp_notice['registration_date'] = ''
+		temp_notice['registration_time'] = ''
+		
+		temp_notice['activity_list'] = []
+						
+	return temp_notice
 	
 def read_current_notice(districtName):
 	current_notice = {}
@@ -519,8 +681,9 @@ def checkRegistrationTime(regDate, regTime):
 def checkRegistrationLimit(districtName):
 	noticeData = read_current_notice(districtName)
 	regLimit = noticeData['max_groupsize']
-	regCount = Current_Registration.objects.filter(district=districtName).count()
-	if regCount >= regLimit:
+	regData = readRegistrationData(districtName)
+	child_count = getChildCount(regData)
+	if child_count >= regLimit:
 		return False
 	else:
 		return True
@@ -571,6 +734,12 @@ def readRegistrationData(districtName):
 	regData['regList'] = regList	
 	return regData
 
+def getChildCount(regdata):
+	childCount = 0
+	if regdata['count'] > 0:
+		for reg in regdata['regList']:	
+			childCount = childCount + reg['num_of_children']
+	return childCount
 def clearRegistrationData(districtName):
 	regDB = Current_Registration.objects.filter(district=districtName)
 	regDB.delete()
@@ -589,4 +758,29 @@ def update_json_file(district, gathering_date):
 	pFile.close()
 	
 	
+def getHistoryList(district):
+	l = len(district)
+	file_list = [os.path.splitext(ff)[0] for ff in os.listdir(notice_file_path) \
+                 if ff[:l] == district ]
+	file_list.sort(key=lambda filename: datetime.strptime(filename[l+1:l+11], "%Y-%m-%d"), reverse=True )
+	for filename in file_list:
+		filename = os.path.splitext(filename)[0]
+
+	return file_list
+
+def getHistoryRegData(jsonfile):
+	json_file = notice_file_path + jsonfile + '.json'
+	pFile = open(json_file, 'r')
+	json_data = json.load(pFile)
+	pFile.close()
+	return json_data['registration_data']
+
+def getHistoryNotice(jsonfile):
+	json_file = notice_file_path + jsonfile + '.json'
+	pFile = open(json_file, 'r')
+	json_data = json.load(pFile)
+	pFile.close()
+	return json_data['notice_data']
+
+
 	
