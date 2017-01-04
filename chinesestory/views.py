@@ -645,7 +645,7 @@ def setdefaultnotice(district):
 	places = {
 		'Brossard': 'Bibliothèque de Brossard (Brossard图书馆儿童活动区)',
 		'Longueuil': 'Bibliothèque Georges-Dor',
-		'CDN': 'CDN library',
+		'CDN': 'CDN图书馆儿童活动室（地下一层）',
 		'Montreal': 'Montreal library'
 	}
 	addresses = {
