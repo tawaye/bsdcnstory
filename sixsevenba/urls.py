@@ -29,6 +29,8 @@ urlpatterns = [
 	url(r'^chinesestory/brossard/registration/', views.registration),
 	url(r'^chinesestory/longueuil/$', views.shownotice),
 	url(r'^chinesestory/longueuil/registration/', views.registration),
+	url(r'^chinesestory/cdn/$', views.shownotice),
+	url(r'^chinesestory/cdn/registration/', views.registration),
 	url(r'^chinesestory/montreal/$', views.shownotice),
 	url(r'^chinesestory/montreal/registration/', views.registration),
 	url(r'^chinesestory/createnotice/', views.createnotice),

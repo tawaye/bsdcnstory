@@ -36,8 +36,12 @@
 			{% if registration_allowed %}
 			<button class="uk-button uk-button-large uk-button-primary" style="font-size: 26px"><a href="./registration">我要报名</a></button>
 			{% else %}
-			<p>Too early. Please come back and refresh the page after {{ registration_date }}, {{registration_time }}</p>
-			<button class="uk-button uk-button-large" style="width: 180px; height: 60px; font-size: 30px">我要报名</button>
+				{% if limit_reached %} 
+					<p> registration limit has been reached. Not accepting new registrations.</p>
+				{% else %}
+					<p>Too early. Please come back and refresh the page after {{ registration_date }}, {{registration_time }}</p>
+				{% endif %}
+				<button class="uk-button uk-button-large" style="width: 180px; height: 60px; font-size: 30px; color: grey;">我要报名</button>
 			{% endif %}
 		</div>
 

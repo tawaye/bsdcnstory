@@ -18,6 +18,7 @@ notice_file_path = '/home/tawayee/6677ba-env/sixsevenba/chinesestory/noticefiles
 district_name = {
 	'bsdadmin': 'Brossard',
 	'logadmin': 'Longueuil',
+	'cdnadmin': 'CDN',
 	'mtladmin': 'Montreal',
 }
 
@@ -206,8 +207,9 @@ def createnotice(request):
 			return render(request, 'error.html', {})
 	else:
 		username = request.user.username
-		context['district_name'] = district_name[username]
-		default_notice = setdefaultnotice()
+		district = district_name[username]
+		context['district_name'] = district 
+		default_notice = setdefaultnotice(district)
 		context['heading'] = '管理员功能 - 创建新故事会通知'
 		context.update(default_notice)
 		return render(request, 'createnotice.html', context)
@@ -220,6 +222,8 @@ def shownotice(request):
 		district = 'Brossard'
 	elif 'longueuil' in request.path:
 		district = 'Longueuil'
+	elif 'cdn' in request.path:
+		district = 'CDN'
 	elif 'montreal' in request.path:
 		district = 'Montreal'
 	else:
@@ -240,7 +244,11 @@ def shownotice(request):
 			else:
 				context['registration_allowed'] = False
 			context['registration_count'] = getChildCount(regData)
-			context['limit_reached'] = not checkRegistrationLimit(district)
+			if checkRegistrationLimit(district):
+				context['limit_reached'] = False
+			else:
+				context['limit_reached'] = True
+				context['registration_allowed'] = False
 			context['registration_list'] = regData['regList']
 			context['district_name'] = district
 			context.update(current_notice)
@@ -263,6 +271,8 @@ def registration(request):
 		district = 'Brossard'
 	elif 'longueuil' in request.path:
 		district = 'Longueuil'
+	elif 'cdn' in request.path:
+		district = 'CDN'	
 	elif 'montreal' in request.path:
 		district = 'Montreal'
 	else:
@@ -631,7 +641,20 @@ def read_current_notice(districtName):
 	return current_notice
 	
 	
-def setdefaultnotice():
+def setdefaultnotice(district):
+	places = {
+		'Brossard': 'Bibliothèque de Brossard (Brossard图书馆儿童活动区)',
+		'Longueuil': 'Bibliothèque Georges-Dor',
+		'CDN': 'CDN library',
+		'Montreal': 'Montreal library'
+	}
+	addresses = {
+		'Brossard': '7855 Ave San Francisco, Brossard J4X 2A4',
+		'Longueuil': '2760 chemin de Chambly, Longueuil J4L 1M6',
+		'CDN': '5290 Chemin de la Côté-des-Neiges, Montréal H3T 1Y3',
+		'Montreal': '5290 Chemin de la Côté-des-Neiges, Montréal H3T 1Y3',
+	}
+		
 	default_notice = {}
 	
 	default_notice['district'] = ''
@@ -641,8 +664,8 @@ def setdefaultnotice():
 	default_notice['gathering_date'] = ''
 	default_notice['gathering_starttime'] = '10:00 AM'
 	default_notice['gathering_endtime'] = '11:30 AM'
-	default_notice['gathering_place'] = 'Bibliotique de Brossard (Brossard图书馆儿童活动区)'
-	default_notice['gathering_address'] = '7855 Ave San Francisco, Brossard J4X 2A4'
+	default_notice['gathering_place'] = places[district]
+	default_notice['gathering_address'] = addresses[district]
 	default_notice['registration_date'] = ''
 	default_notice['registration_time'] = ''
 			
