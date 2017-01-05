@@ -10,6 +10,13 @@
 	<script src="{% static 'datepicker.js' %}"></script>
 	<script src="{% static 'autocomplete.js' %}"></script>
 	<script src="{% static 'timepicker.js' %}"></script>
+	<style>
+	p { font-size: 30px; line-height: 120%; }
+	p.smallfont { font-size: 20px; line-height: 120%; }
+	p.largefont { font-size: 36px; line-height: 150%; }
+	p.highlight { color: blue; font-size: 30px; line-height: 120%; }
+	table { font-size: 30px; }
+	</style>
 </head>
 <body class="">
 	<div class="uk-container uk-container-center uk-text-center uk-margin-top">
@@ -19,7 +26,7 @@
 			</div>
 		</div>
 		<div class="uk-panel uk-text-center" style="background-color: rgba(128, 128,128, 0.2); padding-top: 40px; padding-bottom: 40px;">
-			<p style="font-size: 38px"> {{ heading }} </p>
+			<p class="largefont"> {{ heading }} </p>
 		</div>
 		<div class="uk-panel" style="background-color: rgba(128, 128,128, 0.2)">
 		{% block content %}	

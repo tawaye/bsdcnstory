@@ -3,33 +3,41 @@
 	
 	<div class="uk-panel uk-panel-box uk-container-center uk-text-left" style="width:700px; padding: 40px;">
 	{% if isactive %}
-		<p style="font-size: 30px; line-height: 120%">下一期中文故事会将于</p>
-		<p style="font-size: 24px; line-height: 80%; text-indent: 60px;">{{ gathering_date }}, {{ gathering_starttime }} -- {{ gathering_endtime }} </p>
-		<p style="font-size: 30px; line-height: 120%">在以下地点举行：</p>
-		<p style="font-size: 24px; line-height: 80%; text-indent: 60px;">{{ gathering_place }} </p>
-		<p style="font-size: 24px; line-height: 80%; text-indent: 60px;">{{ gathering_address }} </p>
-		<p style="font-size: 30px; line-height: 120%">本期故事会主题为《 {{ gathering_topic }} 》，由{{ gathering_moderator }}主持。</p>
-		<p style="font-size: 30px; line-height: 120%">最大参与儿童人数为 {{ max_groupsize }} 人。报名人数达到限额后将停止报名。每位家长最多可带3名儿童。报名启动时间为
+		<table class="uk-table">
+			<tr><td class="uk-width-1-5">Date</td><td> {{ gathering_date }}, {{ gathering_starttime }} -- {{ gathering_endtime }} </td></tr>
+			<tr><td class="uk-width-1-5">Place</td><td> {{ gathering_place }} </td></tr>
+			<tr><td class="uk-width-1-5">Address</td><td> {{ gathering_address }} </td></tr>
+			<tr><td class="uk-width-1-5">Topic</td><td> {{ gathering_topic }} </td></tr>
+			<tr><td class="uk-width-1-5">Moderator</td><td> {{ gathering_moderator }} </td></tr>
+		</table>
+
+		<p class="highlight">最大参与儿童人数为 {{ max_groupsize }} 人。报名人数达到限额后将停止报名。每位家长最多可带3名儿童。报名启动时间为
 {{ registration_date }}， {{ registration_time }}。您只能在此时间以后报名。</p>
+
+		<hr>
+		<div class="uk-panel uk-text-center" style="padding: 30px">
+			<p>Activities</p>
+		</div>
 
 		{% for this_activity in activity_list %}
 			{% if this_activity.exist %}
-				<p style="font-size: 30px; line-height: 120%;">{{ this_activity.activity_name }}</p>
-				<p style="font-size: 24px; line-height: 120%;"> {{ this_activity.activity_info }}</p>
+				<p>{{ this_activity.activity_name }}</p>
+				<p class="smallfont"> {{ this_activity.activity_info }}</p>
 				{% if this_activity.activity_img_exist %}
 					<img src="{{ this_activity.activity_img_url }}"></img>
 				{% endif %}
 			{% endif %}
+			<hr>
 		{% endfor %}
 		
 
 
-		<p style="font-size: 30px; line-height: 120%">当前已有 {{ registration_count }} 名儿童报名。
+		<p class="highlight">当前已有 {{ registration_count }} 名儿童报名。
 			{% if limit_reached %} 报名已截止。 {% endif %}
 		</p>
-		<ul class="uk-list" style="font-size: 20px; line-height: 120%;">
+		<ul class="uk-list" style="font-size: 26px; line-height: 120%;">
 		{% for reg in registration_list %}
-			<li style="padding-left: 60px;"> {{ reg.parent_name }} ( {{ reg.num_of_children }} )</li>
+			<li style="padding-left: 20px;"> {{ reg.parent_name }} ( {{ reg.num_of_children }} )</li>
 		{% endfor %}
 		</ul>
 		<div class="uk-panel uk-text-center" style="padding-top: 100px">
@@ -37,9 +45,9 @@
 			<button class="uk-button uk-button-large uk-button-primary" style="font-size: 26px"><a href="./registration">我要报名</a></button>
 			{% else %}
 				{% if limit_reached %} 
-					<p> registration limit has been reached. Not accepting new registrations.</p>
+					<p class="smallfont"> registration limit has been reached. Not accepting new registrations.</p>
 				{% else %}
-					<p>Too early. Please come back and refresh the page after {{ registration_date }}, {{registration_time }}</p>
+					<p class="smallfont">Too early. Please come back and refresh the page after {{ registration_date }}, {{registration_time }}</p>
 				{% endif %}
 				<button class="uk-button uk-button-large" style="width: 180px; height: 60px; font-size: 30px; color: grey;">我要报名</button>
 			{% endif %}
