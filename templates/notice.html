@@ -4,11 +4,11 @@
 	<div class="uk-panel uk-panel-box uk-container-center uk-text-left" style="width:700px; padding: 40px;">
 	{% if isactive %}
 		<table class="uk-table">
-			<tr><td class="uk-width-1-5">Date</td><td> {{ gathering_date }}, {{ gathering_starttime }} -- {{ gathering_endtime }} </td></tr>
-			<tr><td class="uk-width-1-5">Place</td><td> {{ gathering_place }} </td></tr>
-			<tr><td class="uk-width-1-5">Address</td><td> {{ gathering_address }} </td></tr>
-			<tr><td class="uk-width-1-5">Topic</td><td> {{ gathering_topic }} </td></tr>
-			<tr><td class="uk-width-1-5">Moderator</td><td> {{ gathering_moderator }} </td></tr>
+			<tr><td class="uk-width-1-5">时间：</td><td> {{ gathering_date }}, {{ gathering_starttime }} -- {{ gathering_endtime }} </td></tr>
+			<tr><td class="uk-width-1-5">地点：</td><td> {{ gathering_place }} </td></tr>
+			<tr><td class="uk-width-1-5">地址：</td><td> {{ gathering_address }} </td></tr>
+			<tr><td class="uk-width-1-5">主题：</td><td> {{ gathering_topic }} </td></tr>
+			<tr><td class="uk-width-1-5">主持人：</td><td> {{ gathering_moderator }} </td></tr>
 		</table>
 
 		<p class="highlight">最大参与儿童人数为 {{ max_groupsize }} 人。报名人数达到限额后将停止报名。每位家长最多可带3名儿童。报名启动时间为
@@ -16,7 +16,7 @@
 
 		<hr>
 		<div class="uk-panel uk-text-center" style="padding: 30px">
-			<p>Activities</p>
+			<p>活动内容介绍</p>
 		</div>
 
 		{% for this_activity in activity_list %}
