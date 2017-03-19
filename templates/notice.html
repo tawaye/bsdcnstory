@@ -22,7 +22,7 @@
 		{% for this_activity in activity_list %}
 			{% if this_activity.exist %}
 				<p>{{ this_activity.activity_name }}</p>
-				<p class="smallfont"> {{ this_activity.activity_info }}</p>
+				<p> {{ this_activity.activity_info }}</p>
 				{% if this_activity.activity_img_exist %}
 					<img src="{{ this_activity.activity_img_url }}"></img>
 				{% endif %}

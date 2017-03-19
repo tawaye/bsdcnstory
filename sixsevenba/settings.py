@@ -125,3 +125,4 @@ MEDIA_URL = '/images/'
 MEDIA_ROOT = '/var/www/6677ba.ca/images'
 MEDIA_URL = '/images/'
 
+FILE_UPLOAD_PERMISSIONS = 0o644
